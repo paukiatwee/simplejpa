@@ -1,0 +1,388 @@
+/**
+ * 
+ */
+package simplejpa.core.repository.jpa;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Order;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.SingularAttribute;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import simplejpa.core.repository.NotFoundException;
+import simplejpa.core.model.Model;
+import simplejpa.core.pagination.DefaultPagination;
+import simplejpa.core.pagination.Pagination;
+import simplejpa.core.repository.DefaultRepository;
+
+/**
+ *
+ */
+class SimpleDefaultRepository implements DefaultRepository {
+
+    /*
+     * Default items per page
+     */
+    protected int itemsPerPage = 12;
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(SimpleDefaultRepository.class);
+
+    protected EntityManager entityManager;
+
+    public SimpleDefaultRepository() {
+
+    }
+
+    @PersistenceContext
+    public void setEntityManager(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
+
+    @Override
+    public <T extends Model<?>> T create(T model) {
+        entityManager.persist(model);
+        return model;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T extends Model<?>> T read(T model) throws NotFoundException {
+        // we do not update model, since we might use model to
+        // update other fields that should update
+        T result = (T) entityManager.find(model.getClass(), model.getId());
+        if(result == null) {
+            throw new NotFoundException();
+        }
+        return result;
+    }
+
+    @Override
+    public <T extends Model<?>> List<T> read(List<T> models) {
+        List<T> results = new ArrayList<T>();
+        return results;
+    }
+
+    @Override
+    public <T extends Model<?>> T update(T model) {
+        T merged = entityManager.merge(model);
+        entityManager.flush();
+        return merged;
+    }
+
+    @Override
+    public <T extends Model<?>> void delete(T model) throws NotFoundException {
+        if (entityManager.contains(model)) {
+            entityManager.remove(model);
+        } else {
+            model = read(model);
+            entityManager.remove(model);
+        }
+    }
+
+    @Override
+    public <T extends Model<?>> void delete(List<T> models) throws NotFoundException {
+        for (T model : models) {
+            delete(model);
+        }
+    }
+
+    @Override
+    public <T extends Model<?>> List<T> getAll(Class<T> type) {
+        List<T> models = null;
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<T> q = cb.createQuery(type);
+        q.from(type);
+        models = entityManager.createQuery(q).getResultList();
+        return models == null ? new ArrayList<T>() : models;
+    }
+
+    @Override
+    public <T extends Model<?>> List<T> getSlice(Class<T> type, int page) {
+        return getSlice(type, page, true, null);
+    }
+
+    @Override
+    public <E extends Model<?>, T> List<E> getSlice(Class<E> type, int page,
+            boolean asc, List<SingularAttribute<E, T>> attributes) {
+        List<E> models;
+        int startPosition = 0;
+        if (page > 0) {
+            startPosition = (page - 1) * getItemsPerPage();
+        }
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<E> q = cb.createQuery(type);
+        Root<E> from = q.from(type);
+        if(attributes != null && attributes.size() > 0) {
+            List<Order> orders = new ArrayList<Order>();
+            for(SingularAttribute<E, T> attribute: attributes) {
+                orders.add(asc? cb.asc(from.get(attribute)): cb.desc(from.get(attribute)));
+            }
+            q.orderBy(orders);
+        }
+
+        models = entityManager.createQuery(q).setMaxResults(getItemsPerPage()).setFirstResult(startPosition).getResultList();
+        return models == null ? new ArrayList<E>() : models;
+    }
+
+    @Override
+    public <T extends Model<?>> List<T> search(Class<T> type, String property, String value) {
+        return null;
+    }
+    @Override
+    public <E extends Model<?>> Pagination<E> search(Class<E> type, String keyword, int page,
+            SingularAttribute<E, String>... attributes) {
+        List<E> models = null;
+
+		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+		CriteriaQuery<E> q = cb.createQuery(type);
+		CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+
+		Root<E> from = q.from(type);
+		Root<E> countFrom = countQuery.from(type);
+
+		if(!(keyword == null || keyword.trim().isEmpty()) && attributes.length>0){
+			if(!keyword.startsWith("%")) {
+				keyword = "%" + keyword;
+			}
+			if(!keyword.endsWith("%")) {
+				keyword = keyword + "%";
+			}
+
+
+			List<Predicate> criteria = new ArrayList<Predicate>();
+			List<Predicate> countCriteria = new ArrayList<Predicate>();
+
+			for(SingularAttribute<E, String> attribute: attributes) {
+				criteria.add(cb.like(cb.upper(from.get(attribute)), keyword.toUpperCase()));
+				countCriteria.add(cb.like(cb.upper(countFrom.get(attribute)), keyword.toUpperCase()));
+			}
+
+			if(criteria.size() == 1) {
+				q.where(criteria.get(0));
+				countQuery.where(countCriteria.get(0));
+			} else {
+				q.where(cb.or(criteria.toArray(new Predicate[0])));
+				countQuery.where(cb.or(countCriteria.toArray(new Predicate[0])));
+			}
+		}
+		countQuery.select(cb.count(countFrom));
+		Long totalCount = entityManager.createQuery(countQuery).getSingleResult();
+
+		int startPosition = 0;
+		if (page > 0) {
+			startPosition = (page - 1) * getItemsPerPage();
+		}
+		models = entityManager.createQuery(q).setMaxResults(getItemsPerPage()).setFirstResult(startPosition).getResultList();
+
+		if(models.size() == 0) {
+			return new DefaultPagination<E>();
+		} else {
+			return new DefaultPagination<E>(page, getItemsPerPage(), totalCount.intValue(), models);
+		}
+    }
+
+	@Override
+	public <E extends Model<?>, T> Pagination<E> search(Class<E> type, T keyword, int page,
+													 SingularAttribute<E, T>... attributes) {
+		List<E> models = null;
+
+		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+		CriteriaQuery<E> q = cb.createQuery(type);
+		Root<E> from = q.from(type);
+		List<Predicate> criteria = new ArrayList<Predicate>();
+
+		for(SingularAttribute<E, T> attribute: attributes) {
+			criteria.add(cb.equal(from.get(attribute), keyword));
+		}
+		if(criteria.size() == 1) {
+			q.where(criteria.get(0));
+		} else {
+			q.where(cb.or(criteria.toArray(new Predicate[0])));
+		}
+
+		Long totalCount = getSearchCount(type, keyword, page, attributes);
+		int startPosition = 0;
+		if (page > 0) {
+			startPosition = (page - 1) * getItemsPerPage();
+		}
+		models = entityManager.createQuery(q).setMaxResults(getItemsPerPage()).setFirstResult(startPosition).getResultList();
+
+		if(models.size() == 0) {
+			return new DefaultPagination<E>();
+		} else {
+			return new DefaultPagination<E>(page, getItemsPerPage(), totalCount.intValue(), models);
+		}
+	}
+
+	private <E extends Model<?>, T> Long getSearchCount(Class<E> type, T keyword, int page,
+														SingularAttribute<E, T>... attributes){
+		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+		CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+		Root<E> from = countQuery.from(type);
+		List<Predicate> criteria = new ArrayList<Predicate>();
+		for(SingularAttribute<E, T> attribute: attributes) {
+			criteria.add(cb.equal(from.get(attribute), keyword));
+		}
+		if(criteria.size() == 1) {
+			countQuery.where(criteria.get(0));
+		} else {
+			countQuery.where(cb.or(criteria.toArray(new Predicate[0])));
+		}
+		countQuery.select(cb.count(from));
+		return entityManager.createQuery(countQuery).getSingleResult();
+	}
+
+    @Override
+    public void setItemsPerPage(int itemPerPage) {
+        this.itemsPerPage = itemPerPage;
+
+    }
+
+    @Override
+    public int getItemsPerPage() {
+        return itemsPerPage;
+    }
+
+    @Override
+    public <T extends Model<?>> long getCount(Class<T> type) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> q = cb.createQuery(Long.class);
+        q.select(cb.count(q.from(type)));
+        Long result = entityManager.createQuery(q).getSingleResult();
+        if (result == null) {
+            return 0l;
+        } else {
+            return result.longValue();
+        }
+    }
+
+
+    @Override
+    public <T extends Model<?>> Pagination<T> getPage(Class<T> type, int page) {
+        return getPage(type, page, true, null);
+    }
+
+    @Override
+    public <E extends Model<?>, T> Pagination<E> getPage(Class<E> type,
+            int page, boolean asc, List<SingularAttribute<E, T>> attributes) {
+        List<E> models = getSlice(type, page, asc, attributes);
+        if (models.size() == 0 && page > 1) {
+            page = 1;
+            models = getSlice(type, 1, asc, attributes);
+        }
+        if(models.size() == 0) {
+            return new DefaultPagination<E>();
+        } else {
+            return new DefaultPagination<E>(page, getItemsPerPage(), (int) getCount(type), models);
+        }
+    }
+
+    @Override
+    public <E extends Model<?>, T> Pagination<E> getPage(
+            SingularAttribute<E, T> attribute, T value, int page) {
+        List<E> models = getMore(attribute, value, getItemsPerPage());
+        if(models.size() == 0 && page > 1) {
+            page = 1;
+            models = getMore(attribute, value, getItemsPerPage());
+        }
+        if(models.size() == 0) {
+            return new DefaultPagination<E>();
+        }
+        long count = getCount(attribute, value);
+        
+        return new DefaultPagination<E>(page, getItemsPerPage(), (int)count, models);
+    }
+    @Override
+    public <E extends Model<?>, T> List<E> getMore(SingularAttribute<E, T> attribute, T value) {
+        return generateTypedQuery(attribute, attribute.getDeclaringType().getJavaType(), value).getResultList();
+    }
+    
+    @Override
+    public <E extends Model<?>, T> List<E> getMore(SingularAttribute<E, T> attribute, T value, int limit) {
+        return generateTypedQuery(attribute, attribute.getDeclaringType().getJavaType(), value).setMaxResults(limit).getResultList();
+    }
+    
+    @Override
+    public <E extends Model<?>, T> List<E> getMore(SingularAttribute<E, T> attribute, T value, int limit, int page) {
+        int startPosition = 0;
+        if (page > 0) {
+            startPosition = (page - 1) * limit;
+        }
+        return generateTypedQuery(attribute, attribute.getDeclaringType().getJavaType(), value).setMaxResults(limit).setFirstResult(startPosition).getResultList();
+    }
+
+    @Override
+    public <E extends Model<?>, T> List<E> getMore(SingularAttribute<E, T> attribute, int limit) {
+
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<E> q = cb.createQuery(attribute.getDeclaringType().getJavaType());
+        Root<E> root = q.from(attribute.getDeclaringType().getJavaType());
+        q.orderBy(cb.desc(root.get(attribute)));
+        return entityManager.createQuery(q).setMaxResults(limit).getResultList();
+    }
+
+    @Override
+    public <E extends Model<?>, T> List<E> getOrderBy(SingularAttribute<E, T> attribute, int limit, boolean asc) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        Class<E> entityClass = attribute.getDeclaringType().getJavaType();
+        CriteriaQuery<E> q = cb.createQuery(entityClass);
+        Root<E> root = q.from(entityClass);
+        q.orderBy(asc ? cb.asc(root.get(attribute)) : cb.desc(root.get(attribute)));
+        return entityManager.createQuery(q).setMaxResults(limit).getResultList();
+    }
+
+    @Override
+    public <E extends Model<?>, T> List<E> getGroupBy(SingularAttribute<E, T> attribute) {
+        return null;
+    }
+
+    @Override
+    public <E extends Model<?>, T> E getOne(SingularAttribute<E, T> attribute, T value) {
+        E result = null;
+        try {
+            result = generateTypedQuery(attribute, attribute.getDeclaringType().getJavaType(), value).getSingleResult();
+        } catch (NoResultException e) {
+            LOGGER.info("Failed to find record", e);
+        }
+        return result;
+    }
+
+    @Override
+    public <E extends Model<?>, T> long getCount(SingularAttribute<E, T> attribute, T value) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> q = cb.createQuery(Long.class);
+        Root<E> from = q.from(attribute.getDeclaringType().getJavaType());
+        q.select(cb.count(from));
+        Predicate predicate = cb.equal(from.get(attribute), value);
+        q.where(predicate);
+        Long result = entityManager.createQuery(q).getSingleResult();
+        return result == null ? 0l : result.longValue();
+    }
+
+    protected <E extends Model<?>, T> TypedQuery<E> generateTypedQuery(SingularAttribute<E, T> attribute, Class<E> type,
+            T value) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<E> q = cb.createQuery(type);
+        Root<E> from = q.from(type);
+        Predicate predicate = cb.equal(from.get(attribute), value);
+        q.where(predicate);
+        return entityManager.createQuery(q);
+    }
+
+    @Override
+    public <E extends Model<?>, T> List<E> getOrderBy(
+            SingularAttribute<E, T> attribute, boolean asc) {
+        return getOrderBy(attribute, getItemsPerPage(), asc);
+    }
+}
