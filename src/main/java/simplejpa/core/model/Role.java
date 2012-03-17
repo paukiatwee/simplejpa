@@ -4,13 +4,14 @@
 package simplejpa.core.model;
 
 /**
- *
+ * @author Pau Kiat Wee (mailto:paukiatwee@gmail.com)
+ * @since 0.1
  */
 public enum Role {
     
-    ROOT("Member", "ROLE_ROOT"),
-    ADMIN("Ambassador", "ROLE_ADMIN"),
-    USER("Admin", "ROLE_USER");
+    ROOT("Root", "ROLE_ROOT"),
+    ADMIN("Admin", "ROLE_ADMIN"),
+    USER("User", "ROLE_USER");
     
     
     private final String displayName;

@@ -14,7 +14,8 @@ import simplejpa.core.pagination.Pagination;
 
 
 /**
- *
+ * @author Pau Kiat Wee (mailto:paukiatwee@gmail.com)
+ * @since 0.1
  */
 public interface DefaultRepository {
 	/**

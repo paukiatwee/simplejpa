@@ -7,7 +7,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
- *
+ * @author Pau Kiat Wee (mailto:paukiatwee@gmail.com)
+ * @since 0.1
  */
 public class Password {
     

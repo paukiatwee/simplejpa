@@ -6,7 +6,8 @@ package simplejpa.core.model;
 import javax.persistence.Embeddable;
 
 /**
- *
+ * @author Pau Kiat Wee (mailto:paukiatwee@gmail.com)
+ * @since 0.1
  */
 @Embeddable
 public class Address {

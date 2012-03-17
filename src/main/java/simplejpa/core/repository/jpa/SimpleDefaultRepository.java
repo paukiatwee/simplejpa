@@ -27,7 +27,8 @@ import simplejpa.core.pagination.Pagination;
 import simplejpa.core.repository.DefaultRepository;
 
 /**
- *
+ * @author Pau Kiat Wee (mailto:paukiatwee@gmail.com)
+ * @since 0.1
  */
 class SimpleDefaultRepository implements DefaultRepository {
 

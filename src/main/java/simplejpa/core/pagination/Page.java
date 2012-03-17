@@ -4,7 +4,8 @@
 package simplejpa.core.pagination;
 
 /**
- *
+ * @author Pau Kiat Wee (mailto:paukiatwee@gmail.com)
+ * @since 0.1
  */
 public class Page {
 	private int index;
