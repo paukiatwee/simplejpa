@@ -10,7 +10,8 @@ import javax.persistence.Embeddable;
 import javax.validation.constraints.Size;
 
 /**
- *
+ * @author Pau Kiat Wee (mailto:paukiatwee@gmail.com)
+ * @since 0.1
  */
 @Embeddable
 public class Name implements Serializable {

@@ -4,7 +4,8 @@
 package simplejpa.core.model;
 
 /**
- *
+ * @author Pau Kiat Wee (mailto:paukiatwee@gmail.com)
+ * @since 0.1
  */
 public enum Gender {
     
