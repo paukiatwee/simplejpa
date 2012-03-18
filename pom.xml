@@ -20,11 +20,17 @@
     <junit.version>4.10</junit.version>
     <mockito.version>1.9.0</mockito.version>
   </properties>
-  
-  <build>
-    <finalName>simplejpa</finalName>
-  </build>
 
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>2.8.1</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
   <dependencies>
     
     <!-- logging -->
@@ -74,4 +80,24 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  
+  <profiles>
+    <profile>
+      <id>report</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-javadoc-plugin</artifactId>
+          </plugin>
+        </plugins>
+      </build>
+      <reporting>
+        <plugins>
+          <plugin>
+            <artifactId>maven-javadoc-plugin</artifactId>
+          </plugin>
+        </plugins>
+      </reporting>
+    </profile>
+  </profiles>
 </project>
