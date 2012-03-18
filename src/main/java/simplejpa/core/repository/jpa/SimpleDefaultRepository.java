@@ -63,14 +63,18 @@ class SimpleDefaultRepository implements DefaultRepository {
         // update other fields that should update
         T result = (T) entityManager.find(model.getClass(), model.getId());
         if(result == null) {
-            throw new NotFoundException();
+            throw new NotFoundException("Model[" + model.getClass().getName() + "] with id " + model.getId() + " not found");
         }
         return result;
     }
 
     @Override
-    public <T extends Model<?>> List<T> read(List<T> models) {
+    public <T extends Model<?>> List<T> read(List<T> models) throws NotFoundException {
+        models = safe(models);
         List<T> results = new ArrayList<T>();
+        for(T model: models) {
+            results.add(read(model));
+        }
         return results;
     }
 
@@ -100,12 +104,10 @@ class SimpleDefaultRepository implements DefaultRepository {
 
     @Override
     public <T extends Model<?>> List<T> getAll(Class<T> type) {
-        List<T> models = null;
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<T> q = cb.createQuery(type);
         q.from(type);
-        models = entityManager.createQuery(q).getResultList();
-        return models == null ? new ArrayList<T>() : models;
+        return safe(entityManager.createQuery(q).getResultList());
     }
 
     @Override
@@ -133,12 +135,12 @@ class SimpleDefaultRepository implements DefaultRepository {
         }
 
         models = entityManager.createQuery(q).setMaxResults(getItemsPerPage()).setFirstResult(startPosition).getResultList();
-        return models == null ? new ArrayList<E>() : models;
+        return safe(models);
     }
 
     @Override
     public <T extends Model<?>> List<T> search(Class<T> type, String property, String value) {
-        return null;
+        throw new UnsupportedOperationException();
     }
     @Override
     public <E extends Model<?>> Pagination<E> search(Class<E> type, String keyword, int page,
@@ -185,8 +187,8 @@ class SimpleDefaultRepository implements DefaultRepository {
 			startPosition = (page - 1) * getItemsPerPage();
 		}
 		models = entityManager.createQuery(q).setMaxResults(getItemsPerPage()).setFirstResult(startPosition).getResultList();
-
-		if(models.size() == 0) {
+		
+		if(models == null || models.size() == 0) {
 			return new DefaultPagination<E>();
 		} else {
 			return new DefaultPagination<E>(page, getItemsPerPage(), totalCount.intValue(), models);
@@ -219,7 +221,7 @@ class SimpleDefaultRepository implements DefaultRepository {
 		}
 		models = entityManager.createQuery(q).setMaxResults(getItemsPerPage()).setFirstResult(startPosition).getResultList();
 
-		if(models.size() == 0) {
+		if(models == null || models.size() == 0) {
 			return new DefaultPagination<E>();
 		} else {
 			return new DefaultPagination<E>(page, getItemsPerPage(), totalCount.intValue(), models);
@@ -282,7 +284,7 @@ class SimpleDefaultRepository implements DefaultRepository {
             page = 1;
             models = getSlice(type, 1, asc, attributes);
         }
-        if(models.size() == 0) {
+        if(models == null || models.size() == 0) {
             return new DefaultPagination<E>();
         } else {
             return new DefaultPagination<E>(page, getItemsPerPage(), (int) getCount(type), models);
@@ -297,7 +299,7 @@ class SimpleDefaultRepository implements DefaultRepository {
             page = 1;
             models = getMore(attribute, value, getItemsPerPage());
         }
-        if(models.size() == 0) {
+        if(models == null || models.size() == 0) {
             return new DefaultPagination<E>();
         }
         long count = getCount(attribute, value);
@@ -345,7 +347,7 @@ class SimpleDefaultRepository implements DefaultRepository {
 
     @Override
     public <E extends Model<?>, T> List<E> getGroupBy(SingularAttribute<E, T> attribute) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -385,5 +387,13 @@ class SimpleDefaultRepository implements DefaultRepository {
     public <E extends Model<?>, T> List<E> getOrderBy(
             SingularAttribute<E, T> attribute, boolean asc) {
         return getOrderBy(attribute, getItemsPerPage(), asc);
+    }
+    
+    private <T> List<T> safe(List<T> list) {
+        if(list == null) {
+            list = new ArrayList<T>();
+        }
+        
+        return list;
     }
 }

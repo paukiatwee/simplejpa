@@ -40,8 +40,9 @@ public interface DefaultRepository {
 	 * @param <T> the model extended from <code>Model</code>
 	 * @param models from system input
 	 * @return models from data store or empty <code>ArrayList<T></code>
+	 * @throws NotFoundException when one of the model is not found
 	 */
-	<T extends Model<?>> List<T> read(List<T> models);
+	<T extends Model<?>> List<T> read(List<T> models) throws NotFoundException;
 	/**
 	 * This method is used to update single <code>model</code>
 	 * @param <T> the model extended from <code>Model</code>
