@@ -73,6 +73,15 @@ public class Password {
     }
     
     
+    public boolean isMatch() {
+        if(getPassword() != null && getConfirm() != null && getPassword().equals(getConfirm())) {
+            return true;
+        } else {
+            clear();
+            return false;
+        }
+    }
+    
     
     
 
