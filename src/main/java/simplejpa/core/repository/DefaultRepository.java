@@ -89,77 +89,77 @@ public interface DefaultRepository {
 	 * @param page the index of the slice get from data store
 	 * @param asc true for ascending, false for descending
 	 * @param attributes list of attributes that used to do sorting
-	 * @return lsit of models that sorted by <coded>attribures</code>, null safe
+	 * @return list of models that sorted by <coded>attributes</code>, null safe
 	 */
 	<E extends Model<?>, T> List<E> getSlice(Class<E> type, int page, boolean asc, List<SingularAttribute<E, T>> attributes);
 	/**
-	 * @param type
-	 * @param page
-	 * @return
+	 * @param type of the model query from data store
+	 * @param page the index of the slice get from data store
+	 * @return pagination of the models
 	 */
 	<T extends Model<?>> Pagination<T> getPage(Class<T> type, int page);
 	/**
 	 * @param attribute
 	 * @param value
 	 * @param page
-	 * @return
+	 * @return pagination of the models
 	 */
 	<E extends Model<?>, T> Pagination<E> getPage(SingularAttribute<E, T> attribute, T value, int page);
 	/**
-	 * @param type
-	 * @param page
-	 * @param asc
-	 * @param attributes
-	 * @return
+	 * @param type of the model query from data store
+	 * @param page the index of the slice get from data store
+	 * @param asc sorting is ascending?
+	 * @param attributes used to sort
+	 * @return pagination of the models
 	 */
 	<E extends Model<?>, T> Pagination<E> getPage(Class<E> type, int page, boolean asc, List<SingularAttribute<E, T>> attributes);
 	/**
-	 * @param type
+	 * @param type of the model query from data store
 	 * @param property
 	 * @param value
 	 * @return
 	 */
 	<T extends Model<?>> List<T> search(Class<T> type, String property, String value);
 	/**
-	 * @param type
-	 * @param keyword
-	 * @param page
-	 * @param attributes
-	 * @return
+	 * @param type of the model query from data store
+	 * @param keyword to search
+	 * @param page the index of the slice get from data store
+	 * @param attributes used to search
+	 * @return pagination of the models
 	 */
 	<E extends Model<?>> Pagination<E> search(Class<E> type, String keyword, int page, SingularAttribute<E, String>... attributes);
 	/**
-	 * @param type
-	 * @param keyword
-	 * @param page
-	 * @param attributes
-	 * @return
+	 * @param type of the model query from data store
+	 * @param keyword to search
+	 * @param page the index of the slice get from data store
+	 * @param attributes used to search
+	 * @return pagination of the models
 	 */
 	<E extends Model<?>, T> Pagination<E> search(Class<E> type, T keyword, int page, SingularAttribute<E, T>... attributes);
 	/**
-	 * @param type
-	 * @return
+	 * @param type of the model query from data store
+	 * @return count of the model type <code>type</code> in data store
 	 */
 	<T extends Model<?>> long getCount(Class<T> type);
 	/**
-	 * @param attribute
-	 * @param value
-	 * @return
+	 * @param attribute used to compare with value <code>value</code>
+	 * @param value to be used to do comparison
+	 * @return List of the models where <code>attribute</code> equals <code>value</code>
 	 */
 	<E extends Model<?>, T> List<E> getMore(SingularAttribute<E, T> attribute,T value);
 	/**
-	 * @param attribute
-	 * @param value
-	 * @param limit
-	 * @return
+     * @param attribute used to compare with value <code>value</code>
+     * @param value to be used to do comparison
+	 * @param limit of the size of the list to be returned
+	 * @return List of the models where <code>attribute</code> equals <code>value</code> and limit to <code>limit</code>
 	 */
 	<E extends Model<?>, T> List<E> getMore(SingularAttribute<E, T> attribute,T value, int limit);
 	/**
-	 * @param attribute
-	 * @param value
-	 * @param limit
-	 * @param page
-	 * @return
+	 * @param attribute used to compare with value <code>value</code>
+	 * @param value to be used to do comparison
+	 * @param limit of the size of the list to be returned
+	 * @param page the index of the slice get from data store
+	 * @return List of the models match the criteria
 	 */
 	<E extends Model<?>, T> List<E> getMore(SingularAttribute<E, T> attribute,T value, int limit, int page);
 	/**
