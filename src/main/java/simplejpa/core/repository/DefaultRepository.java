@@ -8,7 +8,6 @@ import java.util.List;
 import javax.persistence.metamodel.SingularAttribute;
 
 import simplejpa.core.repository.NotFoundException;
-import simplejpa.core.model.Model;
 import simplejpa.core.pagination.Pagination;
 
 
@@ -25,7 +24,7 @@ public interface DefaultRepository {
 	 * @return model created by underlying data store
 	 * 				 with key generated
 	 */
-	<T extends Model<?>> T create(T model);
+	<T> T create(T model);
 	/**
 	 * This is method is used to find specific model based on
 	 * the <code>model.getId()</code>
@@ -33,7 +32,7 @@ public interface DefaultRepository {
 	 * @param model
 	 * @return model found by using <code>T.getId()</code>
 	 */
-	<T extends Model<?>> T read(T model) throws NotFoundException;
+	<T> T read(T model) throws NotFoundException;
 	/**
 	 * This method is used to read multiple <code>Model</code>
 	 * from data store based on the <code>T.getId()</code> method
@@ -42,14 +41,14 @@ public interface DefaultRepository {
 	 * @return models from data store or empty <code>ArrayList<T></code>
 	 * @throws NotFoundException when one of the model is not found
 	 */
-	<T extends Model<?>> List<T> read(List<T> models) throws NotFoundException;
+	<T> List<T> read(List<T> models) throws NotFoundException;
 	/**
 	 * This method is used to update single <code>model</code>
 	 * @param <T> the model extended from <code>Model</code>
 	 * @param model need to be update
 	 * @return model after update
 	 */
-	<T extends Model<?>> T update(T model);
+	<T> T update(T model);
 	/**
 	 * This method will delete single model from data store based
 	 * on the <code>T.getId()</code> method. If the model does not
@@ -57,7 +56,7 @@ public interface DefaultRepository {
 	 * @param <T> the model extended from <code>Model</code>
 	 * @param model need to be delete from data store
 	 */
-	<T extends Model<?>> void delete(T model) throws NotFoundException;
+	<T> void delete(T model) throws NotFoundException;
 	/**
 	 * This method will delete multiple models from data store based
 	 * on the <code>T.getId()</code> method. If the models does not
@@ -68,21 +67,21 @@ public interface DefaultRepository {
 	 * @param models need to be delete from data store
 	 * @throws NotFoundException when
 	 */
-	<T extends Model<?>> void delete(List<T> models) throws NotFoundException;
+	<T> void delete(List<T> models) throws NotFoundException;
 	
 	/**
 	 * Get all of the models which is type of <code>type</code>
 	 * @param type of the model query from data store
 	 * @return list of the models, null safe
 	 */
-	<T extends Model<?>> List<T> getAll(Class<T> type);
+	<T> List<T> getAll(Class<T> type);
 	/**
 	 * Get list of models, slice based on {@link int getItemsPerPage();} as limit
 	 * @param type of the model query from data store
 	 * @param page the index of the slice get from data store
 	 * @return list of the models, null safe
 	 */
-	<T extends Model<?>> List<T> getSlice(Class<T> type, int page);
+	<T> List<T> getSlice(Class<T> type, int page);
 	/**
 	 * Get list of models, sorted based on model's attributes.
 	 * @param type of the model query from data store
@@ -91,20 +90,20 @@ public interface DefaultRepository {
 	 * @param attributes list of attributes that used to do sorting
 	 * @return list of models that sorted by <coded>attributes</code>, null safe
 	 */
-	<E extends Model<?>, T> List<E> getSlice(Class<E> type, int page, boolean asc, List<SingularAttribute<E, T>> attributes);
+	<E, T> List<E> getSlice(Class<E> type, int page, boolean asc, List<SingularAttribute<E, T>> attributes);
 	/**
 	 * @param type of the model query from data store
 	 * @param page the index of the slice get from data store
 	 * @return pagination of the models
 	 */
-	<T extends Model<?>> Pagination<T> getPage(Class<T> type, int page);
+	<T> Pagination<T> getPage(Class<T> type, int page);
 	/**
 	 * @param attribute
 	 * @param value
 	 * @param page
 	 * @return pagination of the models
 	 */
-	<E extends Model<?>, T> Pagination<E> getPage(SingularAttribute<E, T> attribute, T value, int page);
+	<E, T> Pagination<E> getPage(SingularAttribute<E, T> attribute, T value, int page);
 	/**
 	 * @param type of the model query from data store
 	 * @param page the index of the slice get from data store
@@ -112,14 +111,14 @@ public interface DefaultRepository {
 	 * @param attributes used to sort
 	 * @return pagination of the models
 	 */
-	<E extends Model<?>, T> Pagination<E> getPage(Class<E> type, int page, boolean asc, List<SingularAttribute<E, T>> attributes);
+	<E, T> Pagination<E> getPage(Class<E> type, int page, boolean asc, List<SingularAttribute<E, T>> attributes);
 	/**
 	 * @param type of the model query from data store
 	 * @param property
 	 * @param value
 	 * @return
 	 */
-	<T extends Model<?>> List<T> search(Class<T> type, String property, String value);
+	<T> List<T> search(Class<T> type, String property, String value);
 	/**
 	 * @param type of the model query from data store
 	 * @param keyword to search
@@ -127,7 +126,7 @@ public interface DefaultRepository {
 	 * @param attributes used to search
 	 * @return pagination of the models
 	 */
-	<E extends Model<?>> Pagination<E> search(Class<E> type, String keyword, int page, SingularAttribute<E, String>... attributes);
+	<E> Pagination<E> search(Class<E> type, String keyword, int page, SingularAttribute<E, String>... attributes);
 	/**
 	 * @param type of the model query from data store
 	 * @param keyword to search
@@ -135,25 +134,25 @@ public interface DefaultRepository {
 	 * @param attributes used to search
 	 * @return pagination of the models
 	 */
-	<E extends Model<?>, T> Pagination<E> search(Class<E> type, T keyword, int page, SingularAttribute<E, T>... attributes);
+	<E, T> Pagination<E> search(Class<E> type, T keyword, int page, SingularAttribute<E, T>... attributes);
 	/**
 	 * @param type of the model query from data store
 	 * @return count of the model type <code>type</code> in data store
 	 */
-	<T extends Model<?>> long getCount(Class<T> type);
+	<T> long getCount(Class<T> type);
 	/**
 	 * @param attribute used to compare with value <code>value</code>
 	 * @param value to be used to do comparison
 	 * @return List of the models where <code>attribute</code> equals <code>value</code>
 	 */
-	<E extends Model<?>, T> List<E> getMore(SingularAttribute<E, T> attribute,T value);
+	<E, T> List<E> getMore(SingularAttribute<E, T> attribute,T value);
 	/**
      * @param attribute used to compare with value <code>value</code>
      * @param value to be used to do comparison
 	 * @param limit of the size of the list to be returned
 	 * @return List of the models where <code>attribute</code> equals <code>value</code> and limit to <code>limit</code>
 	 */
-	<E extends Model<?>, T> List<E> getMore(SingularAttribute<E, T> attribute,T value, int limit);
+	<E, T> List<E> getMore(SingularAttribute<E, T> attribute,T value, int limit);
 	/**
 	 * @param attribute used to compare with value <code>value</code>
 	 * @param value to be used to do comparison
@@ -161,43 +160,43 @@ public interface DefaultRepository {
 	 * @param page the index of the slice get from data store
 	 * @return List of the models match the criteria
 	 */
-	<E extends Model<?>, T> List<E> getMore(SingularAttribute<E, T> attribute,T value, int limit, int page);
+	<E, T> List<E> getMore(SingularAttribute<E, T> attribute,T value, int limit, int page);
 	/**
 	 * @param attribute
 	 * @param limit
 	 * @return
 	 */
-	<E extends Model<?>, T> List<E> getMore(SingularAttribute<E, T> attribute, int limit);
+	<E, T> List<E> getMore(SingularAttribute<E, T> attribute, int limit);
 	/**
 	 * @param attribute
 	 * @param asc
 	 * @return
 	 */
-	<E extends Model<?>, T> List<E> getOrderBy(SingularAttribute<E, T> attribute, boolean asc);
+	<E, T> List<E> getOrderBy(SingularAttribute<E, T> attribute, boolean asc);
 	/**
 	 * @param attribute
 	 * @param limit
 	 * @param asc
 	 * @return
 	 */
-	<E extends Model<?>, T> List<E> getOrderBy(SingularAttribute<E, T> attribute, int limit, boolean asc);
+	<E, T> List<E> getOrderBy(SingularAttribute<E, T> attribute, int limit, boolean asc);
 	/**
 	 * @param attribute
 	 * @return
 	 */
-	<E extends Model<?>, T> List<E> getGroupBy(SingularAttribute<E, T> attribute);
-	/**
-	 * @param attribute
-	 * @param value
-	 * @return
-	 */
-	<E extends Model<?>, T> E getOne(SingularAttribute<E, T> attribute, T value);
+	<E, T> List<E> getGroupBy(SingularAttribute<E, T> attribute);
 	/**
 	 * @param attribute
 	 * @param value
 	 * @return
 	 */
-	<E extends Model<?>, T> long getCount(SingularAttribute<E, T> attribute, T value);
+	<E, T> E getOne(SingularAttribute<E, T> attribute, T value);
+	/**
+	 * @param attribute
+	 * @param value
+	 * @return
+	 */
+	<E, T> long getCount(SingularAttribute<E, T> attribute, T value);
 	/**
 	 * @param itemPerPage
 	 */

@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import simplejpa.core.repository.NotFoundException;
-import simplejpa.core.model.Model;
 import simplejpa.core.pagination.DefaultPagination;
 import simplejpa.core.pagination.Pagination;
 import simplejpa.core.repository.DefaultRepository;
@@ -51,25 +50,26 @@ class SimpleDefaultRepository implements DefaultRepository {
     }
 
     @Override
-    public <T extends Model<?>> T create(T model) {
+    public <T> T create(T model) {
         entityManager.persist(model);
         return model;
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T extends Model<?>> T read(T model) throws NotFoundException {
+    public <T> T read(T model) throws NotFoundException {
         // we do not update model, since we might use model to
         // update other fields that should update
-        T result = (T) entityManager.find(model.getClass(), model.getId());
+        Object id = entityManager.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(model);
+        T result = (T) entityManager.find(model.getClass(), id);
         if(result == null) {
-            throw new NotFoundException("Model[" + model.getClass().getName() + "] with id " + model.getId() + " not found");
+            throw new NotFoundException("Model[" + model.getClass().getName() + "] with id " + id + " not found");
         }
         return result;
     }
 
     @Override
-    public <T extends Model<?>> List<T> read(List<T> models) throws NotFoundException {
+    public <T> List<T> read(List<T> models) throws NotFoundException {
         models = safe(models);
         List<T> results = new ArrayList<T>();
         for(T model: models) {
@@ -79,14 +79,14 @@ class SimpleDefaultRepository implements DefaultRepository {
     }
 
     @Override
-    public <T extends Model<?>> T update(T model) {
+    public <T> T update(T model) {
         T merged = entityManager.merge(model);
         entityManager.flush();
         return merged;
     }
 
     @Override
-    public <T extends Model<?>> void delete(T model) throws NotFoundException {
+    public <T> void delete(T model) throws NotFoundException {
         if (entityManager.contains(model)) {
             entityManager.remove(model);
         } else {
@@ -96,14 +96,14 @@ class SimpleDefaultRepository implements DefaultRepository {
     }
 
     @Override
-    public <T extends Model<?>> void delete(List<T> models) throws NotFoundException {
+    public <T> void delete(List<T> models) throws NotFoundException {
         for (T model : models) {
             delete(model);
         }
     }
 
     @Override
-    public <T extends Model<?>> List<T> getAll(Class<T> type) {
+    public <T> List<T> getAll(Class<T> type) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<T> q = cb.createQuery(type);
         q.from(type);
@@ -111,12 +111,12 @@ class SimpleDefaultRepository implements DefaultRepository {
     }
 
     @Override
-    public <T extends Model<?>> List<T> getSlice(Class<T> type, int page) {
+    public <T> List<T> getSlice(Class<T> type, int page) {
         return getSlice(type, page, true, null);
     }
 
     @Override
-    public <E extends Model<?>, T> List<E> getSlice(Class<E> type, int page,
+    public <E, T> List<E> getSlice(Class<E> type, int page,
             boolean asc, List<SingularAttribute<E, T>> attributes) {
         List<E> models;
         int startPosition = 0;
@@ -139,11 +139,11 @@ class SimpleDefaultRepository implements DefaultRepository {
     }
 
     @Override
-    public <T extends Model<?>> List<T> search(Class<T> type, String property, String value) {
+    public <T> List<T> search(Class<T> type, String property, String value) {
         throw new UnsupportedOperationException();
     }
     @Override
-    public <E extends Model<?>> Pagination<E> search(Class<E> type, String keyword, int page,
+    public <E> Pagination<E> search(Class<E> type, String keyword, int page,
             SingularAttribute<E, String>... attributes) {
         List<E> models = null;
 
@@ -196,7 +196,7 @@ class SimpleDefaultRepository implements DefaultRepository {
     }
 
 	@Override
-	public <E extends Model<?>, T> Pagination<E> search(Class<E> type, T keyword, int page,
+	public <E, T> Pagination<E> search(Class<E> type, T keyword, int page,
 													 SingularAttribute<E, T>... attributes) {
 		List<E> models = null;
 
@@ -228,7 +228,7 @@ class SimpleDefaultRepository implements DefaultRepository {
 		}
 	}
 
-	private <E extends Model<?>, T> Long getSearchCount(Class<E> type, T keyword, int page,
+	private <E, T> Long getSearchCount(Class<E> type, T keyword, int page,
 														SingularAttribute<E, T>... attributes){
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 		CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
@@ -258,7 +258,7 @@ class SimpleDefaultRepository implements DefaultRepository {
     }
 
     @Override
-    public <T extends Model<?>> long getCount(Class<T> type) {
+    public <T> long getCount(Class<T> type) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Long> q = cb.createQuery(Long.class);
         q.select(cb.count(q.from(type)));
@@ -272,12 +272,12 @@ class SimpleDefaultRepository implements DefaultRepository {
 
 
     @Override
-    public <T extends Model<?>> Pagination<T> getPage(Class<T> type, int page) {
+    public <T> Pagination<T> getPage(Class<T> type, int page) {
         return getPage(type, page, true, null);
     }
 
     @Override
-    public <E extends Model<?>, T> Pagination<E> getPage(Class<E> type,
+    public <E, T> Pagination<E> getPage(Class<E> type,
             int page, boolean asc, List<SingularAttribute<E, T>> attributes) {
         List<E> models = getSlice(type, page, asc, attributes);
         if (models.size() == 0 && page > 1) {
@@ -292,7 +292,7 @@ class SimpleDefaultRepository implements DefaultRepository {
     }
 
     @Override
-    public <E extends Model<?>, T> Pagination<E> getPage(
+    public <E, T> Pagination<E> getPage(
             SingularAttribute<E, T> attribute, T value, int page) {
         List<E> models = getMore(attribute, value, getItemsPerPage());
         if(models.size() == 0 && page > 1) {
@@ -307,17 +307,17 @@ class SimpleDefaultRepository implements DefaultRepository {
         return new DefaultPagination<E>(page, getItemsPerPage(), (int)count, models);
     }
     @Override
-    public <E extends Model<?>, T> List<E> getMore(SingularAttribute<E, T> attribute, T value) {
+    public <E, T> List<E> getMore(SingularAttribute<E, T> attribute, T value) {
         return generateTypedQuery(attribute, attribute.getDeclaringType().getJavaType(), value).getResultList();
     }
     
     @Override
-    public <E extends Model<?>, T> List<E> getMore(SingularAttribute<E, T> attribute, T value, int limit) {
+    public <E, T> List<E> getMore(SingularAttribute<E, T> attribute, T value, int limit) {
         return generateTypedQuery(attribute, attribute.getDeclaringType().getJavaType(), value).setMaxResults(limit).getResultList();
     }
     
     @Override
-    public <E extends Model<?>, T> List<E> getMore(SingularAttribute<E, T> attribute, T value, int limit, int page) {
+    public <E, T> List<E> getMore(SingularAttribute<E, T> attribute, T value, int limit, int page) {
         int startPosition = 0;
         if (page > 0) {
             startPosition = (page - 1) * limit;
@@ -326,7 +326,7 @@ class SimpleDefaultRepository implements DefaultRepository {
     }
 
     @Override
-    public <E extends Model<?>, T> List<E> getMore(SingularAttribute<E, T> attribute, int limit) {
+    public <E, T> List<E> getMore(SingularAttribute<E, T> attribute, int limit) {
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<E> q = cb.createQuery(attribute.getDeclaringType().getJavaType());
@@ -336,7 +336,7 @@ class SimpleDefaultRepository implements DefaultRepository {
     }
 
     @Override
-    public <E extends Model<?>, T> List<E> getOrderBy(SingularAttribute<E, T> attribute, int limit, boolean asc) {
+    public <E, T> List<E> getOrderBy(SingularAttribute<E, T> attribute, int limit, boolean asc) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         Class<E> entityClass = attribute.getDeclaringType().getJavaType();
         CriteriaQuery<E> q = cb.createQuery(entityClass);
@@ -346,12 +346,12 @@ class SimpleDefaultRepository implements DefaultRepository {
     }
 
     @Override
-    public <E extends Model<?>, T> List<E> getGroupBy(SingularAttribute<E, T> attribute) {
+    public <E, T> List<E> getGroupBy(SingularAttribute<E, T> attribute) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public <E extends Model<?>, T> E getOne(SingularAttribute<E, T> attribute, T value) {
+    public <E, T> E getOne(SingularAttribute<E, T> attribute, T value) {
         E result = null;
         try {
             result = generateTypedQuery(attribute, attribute.getDeclaringType().getJavaType(), value).getSingleResult();
@@ -362,7 +362,7 @@ class SimpleDefaultRepository implements DefaultRepository {
     }
 
     @Override
-    public <E extends Model<?>, T> long getCount(SingularAttribute<E, T> attribute, T value) {
+    public <E, T> long getCount(SingularAttribute<E, T> attribute, T value) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Long> q = cb.createQuery(Long.class);
         Root<E> from = q.from(attribute.getDeclaringType().getJavaType());
@@ -373,7 +373,7 @@ class SimpleDefaultRepository implements DefaultRepository {
         return result == null ? 0l : result.longValue();
     }
 
-    protected <E extends Model<?>, T> TypedQuery<E> generateTypedQuery(SingularAttribute<E, T> attribute, Class<E> type,
+    protected <E, T> TypedQuery<E> generateTypedQuery(SingularAttribute<E, T> attribute, Class<E> type,
             T value) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<E> q = cb.createQuery(type);
@@ -384,7 +384,7 @@ class SimpleDefaultRepository implements DefaultRepository {
     }
 
     @Override
-    public <E extends Model<?>, T> List<E> getOrderBy(
+    public <E, T> List<E> getOrderBy(
             SingularAttribute<E, T> attribute, boolean asc) {
         return getOrderBy(attribute, getItemsPerPage(), asc);
     }
