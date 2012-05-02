@@ -5,6 +5,8 @@ package simplejpa.core.repository.jpa;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -16,9 +18,6 @@ import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.SingularAttribute;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import simplejpa.core.repository.NotFoundException;
 import simplejpa.core.pagination.DefaultPagination;
@@ -36,7 +35,7 @@ class SimpleDefaultRepository implements DefaultRepository {
      */
     protected int itemsPerPage = 12;
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(SimpleDefaultRepository.class);
+    private static final Logger LOGGER = Logger.getLogger(SimpleDefaultRepository.class.getName());
 
     protected EntityManager entityManager;
 
@@ -356,7 +355,7 @@ class SimpleDefaultRepository implements DefaultRepository {
         try {
             result = generateTypedQuery(attribute, attribute.getDeclaringType().getJavaType(), value).getSingleResult();
         } catch (NoResultException e) {
-            LOGGER.info("Failed to find record", e);
+            LOGGER.log(Level.INFO, e.getMessage(), e);
         }
         return result;
     }
