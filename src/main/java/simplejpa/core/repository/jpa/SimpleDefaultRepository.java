@@ -395,4 +395,9 @@ class SimpleDefaultRepository implements DefaultRepository {
         
         return list;
     }
+
+    @Override
+    public <T> List<T> getListOf(Class<T> type, String query) {
+        return entityManager.createQuery(query, type).getResultList();
+    }
 }

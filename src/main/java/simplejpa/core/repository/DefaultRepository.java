@@ -197,6 +197,8 @@ public interface DefaultRepository {
 	 * @return
 	 */
 	<E, T> long getCount(SingularAttribute<E, T> attribute, T value);
+	
+	<T> List<T> getListOf(Class<T> type, String query);
 	/**
 	 * @param itemPerPage
 	 */
