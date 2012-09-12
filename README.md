@@ -6,7 +6,7 @@ This framework is mavenized as well. :)
 
 JPA2 Implementation Used
 ------------------------
-Hibernate 4.1.1.FINAL
+Hibernate 4.1.7.Final
 
 Usage
 -----
