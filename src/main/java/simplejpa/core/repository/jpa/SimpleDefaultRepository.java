@@ -146,104 +146,104 @@ class SimpleDefaultRepository implements DefaultRepository {
             SingularAttribute<E, String>... attributes) {
         List<E> models = null;
 
-		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-		CriteriaQuery<E> q = cb.createQuery(type);
-		CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<E> q = cb.createQuery(type);
+        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
 
-		Root<E> from = q.from(type);
-		Root<E> countFrom = countQuery.from(type);
+        Root<E> from = q.from(type);
+        Root<E> countFrom = countQuery.from(type);
 
-		if(!(keyword == null || keyword.trim().isEmpty()) && attributes.length>0){
-			if(!keyword.startsWith("%")) {
-				keyword = "%" + keyword;
-			}
-			if(!keyword.endsWith("%")) {
-				keyword = keyword + "%";
-			}
+        if(!(keyword == null || keyword.trim().isEmpty()) && attributes.length>0){
+            if(!keyword.startsWith("%")) {
+                keyword = "%" + keyword;
+            }
+            if(!keyword.endsWith("%")) {
+                keyword = keyword + "%";
+            }
 
 
-			List<Predicate> criteria = new ArrayList<Predicate>();
-			List<Predicate> countCriteria = new ArrayList<Predicate>();
+            List<Predicate> criteria = new ArrayList<Predicate>();
+            List<Predicate> countCriteria = new ArrayList<Predicate>();
 
-			for(SingularAttribute<E, String> attribute: attributes) {
-				criteria.add(cb.like(cb.upper(from.get(attribute)), keyword.toUpperCase()));
-				countCriteria.add(cb.like(cb.upper(countFrom.get(attribute)), keyword.toUpperCase()));
-			}
+            for(SingularAttribute<E, String> attribute: attributes) {
+                criteria.add(cb.like(cb.upper(from.get(attribute)), keyword.toUpperCase()));
+                countCriteria.add(cb.like(cb.upper(countFrom.get(attribute)), keyword.toUpperCase()));
+            }
 
-			if(criteria.size() == 1) {
-				q.where(criteria.get(0));
-				countQuery.where(countCriteria.get(0));
-			} else {
-				q.where(cb.or(criteria.toArray(new Predicate[0])));
-				countQuery.where(cb.or(countCriteria.toArray(new Predicate[0])));
-			}
-		}
-		countQuery.select(cb.count(countFrom));
-		Long totalCount = entityManager.createQuery(countQuery).getSingleResult();
+            if(criteria.size() == 1) {
+                q.where(criteria.get(0));
+                countQuery.where(countCriteria.get(0));
+            } else {
+                q.where(cb.or(criteria.toArray(new Predicate[0])));
+                countQuery.where(cb.or(countCriteria.toArray(new Predicate[0])));
+            }
+        }
+        countQuery.select(cb.count(countFrom));
+        Long totalCount = entityManager.createQuery(countQuery).getSingleResult();
 
-		int startPosition = 0;
-		if (page > 0) {
-			startPosition = (page - 1) * getItemsPerPage();
-		}
-		models = entityManager.createQuery(q).setMaxResults(getItemsPerPage()).setFirstResult(startPosition).getResultList();
-		
-		if(models == null || models.size() == 0) {
-			return new DefaultPagination<E>();
-		} else {
-			return new DefaultPagination<E>(page, getItemsPerPage(), totalCount.intValue(), models);
-		}
+        int startPosition = 0;
+        if (page > 0) {
+            startPosition = (page - 1) * getItemsPerPage();
+        }
+        models = entityManager.createQuery(q).setMaxResults(getItemsPerPage()).setFirstResult(startPosition).getResultList();
+        
+        if(models == null || models.size() == 0) {
+            return new DefaultPagination<E>();
+        } else {
+            return new DefaultPagination<E>(page, getItemsPerPage(), totalCount.intValue(), models);
+        }
     }
 
-	@Override
-	public <E, T> Pagination<E> search(Class<E> type, T keyword, int page,
-													 SingularAttribute<E, T>... attributes) {
-		List<E> models = null;
+    @Override
+    public <E, T> Pagination<E> search(Class<E> type, T keyword, int page,
+                                                     SingularAttribute<E, T>... attributes) {
+        List<E> models = null;
 
-		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-		CriteriaQuery<E> q = cb.createQuery(type);
-		Root<E> from = q.from(type);
-		List<Predicate> criteria = new ArrayList<Predicate>();
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<E> q = cb.createQuery(type);
+        Root<E> from = q.from(type);
+        List<Predicate> criteria = new ArrayList<Predicate>();
 
-		for(SingularAttribute<E, T> attribute: attributes) {
-			criteria.add(cb.equal(from.get(attribute), keyword));
-		}
-		if(criteria.size() == 1) {
-			q.where(criteria.get(0));
-		} else {
-			q.where(cb.or(criteria.toArray(new Predicate[0])));
-		}
+        for(SingularAttribute<E, T> attribute: attributes) {
+            criteria.add(cb.equal(from.get(attribute), keyword));
+        }
+        if(criteria.size() == 1) {
+            q.where(criteria.get(0));
+        } else {
+            q.where(cb.or(criteria.toArray(new Predicate[0])));
+        }
 
-		Long totalCount = getSearchCount(type, keyword, page, attributes);
-		int startPosition = 0;
-		if (page > 0) {
-			startPosition = (page - 1) * getItemsPerPage();
-		}
-		models = entityManager.createQuery(q).setMaxResults(getItemsPerPage()).setFirstResult(startPosition).getResultList();
+        Long totalCount = getSearchCount(type, keyword, page, attributes);
+        int startPosition = 0;
+        if (page > 0) {
+            startPosition = (page - 1) * getItemsPerPage();
+        }
+        models = entityManager.createQuery(q).setMaxResults(getItemsPerPage()).setFirstResult(startPosition).getResultList();
 
-		if(models == null || models.size() == 0) {
-			return new DefaultPagination<E>();
-		} else {
-			return new DefaultPagination<E>(page, getItemsPerPage(), totalCount.intValue(), models);
-		}
-	}
+        if(models == null || models.size() == 0) {
+            return new DefaultPagination<E>();
+        } else {
+            return new DefaultPagination<E>(page, getItemsPerPage(), totalCount.intValue(), models);
+        }
+    }
 
-	private <E, T> Long getSearchCount(Class<E> type, T keyword, int page,
-														SingularAttribute<E, T>... attributes){
-		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-		CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
-		Root<E> from = countQuery.from(type);
-		List<Predicate> criteria = new ArrayList<Predicate>();
-		for(SingularAttribute<E, T> attribute: attributes) {
-			criteria.add(cb.equal(from.get(attribute), keyword));
-		}
-		if(criteria.size() == 1) {
-			countQuery.where(criteria.get(0));
-		} else {
-			countQuery.where(cb.or(criteria.toArray(new Predicate[0])));
-		}
-		countQuery.select(cb.count(from));
-		return entityManager.createQuery(countQuery).getSingleResult();
-	}
+    private <E, T> Long getSearchCount(Class<E> type, T keyword, int page,
+                                                        SingularAttribute<E, T>... attributes){
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+        Root<E> from = countQuery.from(type);
+        List<Predicate> criteria = new ArrayList<Predicate>();
+        for(SingularAttribute<E, T> attribute: attributes) {
+            criteria.add(cb.equal(from.get(attribute), keyword));
+        }
+        if(criteria.size() == 1) {
+            countQuery.where(criteria.get(0));
+        } else {
+            countQuery.where(cb.or(criteria.toArray(new Predicate[0])));
+        }
+        countQuery.select(cb.count(from));
+        return entityManager.createQuery(countQuery).getSingleResult();
+    }
 
     @Override
     public void setItemsPerPage(int itemPerPage) {
