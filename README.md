@@ -1,4 +1,4 @@
-Simple JPA
+Simple JPA [![Build Status](https://secure.travis-ci.org/paukiatwee/simplejpa.png)](http://travis-ci.org/paukiatwee/simplejpa)
 ==========
 Simple JPA is the lightweight Java JPA2 framework that simplify the usage of JPA2.
 This framework is mavenized as well. :)
