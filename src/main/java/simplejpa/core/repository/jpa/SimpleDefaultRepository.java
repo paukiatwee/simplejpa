@@ -117,10 +117,15 @@ class SimpleDefaultRepository implements DefaultRepository {
     @Override
     public <E, T> List<E> getSlice(Class<E> type, int page,
             boolean asc, List<SingularAttribute<E, T>> attributes) {
+        return getSlice(type, page, asc, attributes, getItemsPerPage());
+    }
+
+    @Override
+    public <E, T> List<E> getSlice(Class<E> type, int page, boolean asc, List<SingularAttribute<E, T>> attributes, int limit) {
         List<E> models;
         int startPosition = 0;
         if (page > 0) {
-            startPosition = (page - 1) * getItemsPerPage();
+            startPosition = (page - 1) * limit;
         }
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<E> q = cb.createQuery(type);
@@ -133,7 +138,7 @@ class SimpleDefaultRepository implements DefaultRepository {
             q.orderBy(orders);
         }
 
-        models = entityManager.createQuery(q).setMaxResults(getItemsPerPage()).setFirstResult(startPosition).getResultList();
+        models = entityManager.createQuery(q).setMaxResults(limit).setFirstResult(startPosition).getResultList();
         return safe(models);
     }
 
@@ -278,15 +283,20 @@ class SimpleDefaultRepository implements DefaultRepository {
     @Override
     public <E, T> Pagination<E> getPage(Class<E> type,
             int page, boolean asc, List<SingularAttribute<E, T>> attributes) {
-        List<E> models = getSlice(type, page, asc, attributes);
+        return getPage(type, page, asc, attributes, getItemsPerPage());
+    }
+
+    @Override
+    public <E, T> Pagination<E> getPage(Class<E> type, int page, boolean asc, List<SingularAttribute<E, T>> attributes, int limit) {
+        List<E> models = getSlice(type, page, asc, attributes, limit);
         if (models.size() == 0 && page > 1) {
             page = 1;
-            models = getSlice(type, 1, asc, attributes);
+            models = getSlice(type, 1, asc, attributes, limit);
         }
         if(models == null || models.size() == 0) {
             return new DefaultPagination<E>();
         } else {
-            return new DefaultPagination<E>(page, getItemsPerPage(), (int) getCount(type), models);
+            return new DefaultPagination<E>(page, limit, (int) getCount(type), models);
         }
     }
 

@@ -91,6 +91,17 @@ public interface DefaultRepository {
      * @return list of models that sorted by <coded>attributes</code>, null safe
      */
     <E, T> List<E> getSlice(Class<E> type, int page, boolean asc, List<SingularAttribute<E, T>> attributes);
+
+    /**
+     * Get list of models with limit, sorted based on model's attributes.
+     * @param type of the model query from data store
+     * @param page the index of the slice get from data store
+     * @param asc true for ascending, false for descending
+     * @param attributes list of attributes that used to do sorting
+     * @param limit of the items
+     * @return list of models that sorted by <coded>attributes</code>, null safe
+     */
+    <E, T> List<E> getSlice(Class<E> type, int page, boolean asc, List<SingularAttribute<E, T>> attributes, int limit);
     /**
      * @param type of the model query from data store
      * @param page the index of the slice get from data store
@@ -112,6 +123,17 @@ public interface DefaultRepository {
      * @return pagination of the models
      */
     <E, T> Pagination<E> getPage(Class<E> type, int page, boolean asc, List<SingularAttribute<E, T>> attributes);
+
+    /**
+     * Return list of models as pagination.
+     * @param type of the model query from data store
+     * @param page the index of the slice get from data store
+     * @param asc sorting is ascending?
+     * @param attributes used to sort.
+     * @param limit item per page
+     * @return pagination of the models
+     */
+    <E, T> Pagination<E> getPage(Class<E> type, int page, boolean asc, List<SingularAttribute<E, T>> attributes, int limit);
     /**
      * @param type of the model query from data store
      * @param property
