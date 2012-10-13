@@ -39,6 +39,7 @@ public class DefaultPagination<T> implements Pagination<T>{
     /**
      * @return the currentPage
      */
+    @Override
     public int getCurrentPage() {
         return currentPage;
     }
@@ -46,6 +47,7 @@ public class DefaultPagination<T> implements Pagination<T>{
     /**
      * @return the size
      */
+    @Override
     public int getSize() {
         return size;
     }
@@ -53,6 +55,7 @@ public class DefaultPagination<T> implements Pagination<T>{
     /**
      * @return the itemPerPage
      */
+    @Override
     public int getMaxResult() {
         return maxResult;
     }
@@ -60,6 +63,7 @@ public class DefaultPagination<T> implements Pagination<T>{
     /**
      * @return the totalPages
      */
+    @Override
     public int getTotalPages() {
         int totalPages = (int)Math.ceil(size / (float)maxResult);
         if(totalPages == 0) {
@@ -70,9 +74,11 @@ public class DefaultPagination<T> implements Pagination<T>{
     /**
      * @return the results
      */
+    @Override
     public List<T> getItems() {
         return items;
     }
+    @Override
     public List<Page> getPages() {
         List<Page> pagar = new ArrayList<Page>();
         int pages = getTotalPages();

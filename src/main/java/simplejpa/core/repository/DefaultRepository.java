@@ -4,10 +4,11 @@
 package simplejpa.core.repository;
 
 import java.util.List;
+import java.util.Map;
+import javax.persistence.NonUniqueResultException;
 
 import javax.persistence.metamodel.SingularAttribute;
 
-import simplejpa.core.repository.NotFoundException;
 import simplejpa.core.pagination.Pagination;
 
 
@@ -134,6 +135,9 @@ public interface DefaultRepository {
      * @return pagination of the models
      */
     <E, T> Pagination<E> getPage(Class<E> type, int page, boolean asc, List<SingularAttribute<E, T>> attributes, int limit);
+    
+    <E, T> Pagination<E> getPage(Class<E> type, int page, String query, String count, int limit, Map<String, Object> parameters);
+    
     /**
      * @param type of the model query from data store
      * @param property
@@ -162,6 +166,8 @@ public interface DefaultRepository {
      * @return count of the model type <code>type</code> in data store
      */
     <T> long getCount(Class<T> type);
+    
+    long getCount(String count, Map<String, Object> parameters);
     /**
      * @param attribute used to compare with value <code>value</code>
      * @param value to be used to do comparison
@@ -212,7 +218,7 @@ public interface DefaultRepository {
      * @param value
      * @return
      */
-    <E, T> E getOne(SingularAttribute<E, T> attribute, T value);
+    <E, T> E getOne(SingularAttribute<E, T> attribute, T value) throws NotFoundException, NonUniqueResultException;
     /**
      * @param attribute
      * @param value
@@ -221,6 +227,10 @@ public interface DefaultRepository {
     <E, T> long getCount(SingularAttribute<E, T> attribute, T value);
     
     <T> List<T> getListOf(Class<T> type, String query);
+    
+    <T> List<T> getListOf(Class<T> type, String query, int page, Map<String, Object> parameters);
+    
+    <T> List<T> getListOf(Class<T> type, String query, int page, int limit, Map<String, Object> parameters);
     /**
      * @param itemPerPage
      */

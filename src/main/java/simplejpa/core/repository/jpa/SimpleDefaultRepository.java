@@ -5,6 +5,7 @@ package simplejpa.core.repository.jpa;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -149,7 +150,6 @@ class SimpleDefaultRepository implements DefaultRepository {
     @Override
     public <E> Pagination<E> search(Class<E> type, String keyword, int page,
             SingularAttribute<E, String>... attributes) {
-        List<E> models = null;
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<E> q = cb.createQuery(type);
@@ -190,9 +190,9 @@ class SimpleDefaultRepository implements DefaultRepository {
         if (page > 0) {
             startPosition = (page - 1) * getItemsPerPage();
         }
-        models = entityManager.createQuery(q).setMaxResults(getItemsPerPage()).setFirstResult(startPosition).getResultList();
+        List<E> models = entityManager.createQuery(q).setMaxResults(getItemsPerPage()).setFirstResult(startPosition).getResultList();
         
-        if(models == null || models.size() == 0) {
+        if(models == null || models.isEmpty()) {
             return new DefaultPagination<E>();
         } else {
             return new DefaultPagination<E>(page, getItemsPerPage(), totalCount.intValue(), models);
@@ -202,7 +202,6 @@ class SimpleDefaultRepository implements DefaultRepository {
     @Override
     public <E, T> Pagination<E> search(Class<E> type, T keyword, int page,
                                                      SingularAttribute<E, T>... attributes) {
-        List<E> models = null;
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<E> q = cb.createQuery(type);
@@ -223,9 +222,9 @@ class SimpleDefaultRepository implements DefaultRepository {
         if (page > 0) {
             startPosition = (page - 1) * getItemsPerPage();
         }
-        models = entityManager.createQuery(q).setMaxResults(getItemsPerPage()).setFirstResult(startPosition).getResultList();
+        List<E> models = entityManager.createQuery(q).setMaxResults(getItemsPerPage()).setFirstResult(startPosition).getResultList();
 
-        if(models == null || models.size() == 0) {
+        if(models == null || models.isEmpty()) {
             return new DefaultPagination<E>();
         } else {
             return new DefaultPagination<E>(page, getItemsPerPage(), totalCount.intValue(), models);
@@ -274,6 +273,16 @@ class SimpleDefaultRepository implements DefaultRepository {
         }
     }
 
+    @Override
+    public long getCount(String count, Map<String, Object> parameters) {
+        TypedQuery<Long> q = entityManager.createQuery(count, Long.class);
+        if(parameters != null && !parameters.isEmpty()) {
+            for(Map.Entry<String, Object> entry: parameters.entrySet()) {
+                q.setParameter(entry.getKey(), entry.getValue());
+            }
+        }
+        return q.getSingleResult();
+    }
 
     @Override
     public <T> Pagination<T> getPage(Class<T> type, int page) {
@@ -289,11 +298,11 @@ class SimpleDefaultRepository implements DefaultRepository {
     @Override
     public <E, T> Pagination<E> getPage(Class<E> type, int page, boolean asc, List<SingularAttribute<E, T>> attributes, int limit) {
         List<E> models = getSlice(type, page, asc, attributes, limit);
-        if (models.size() == 0 && page > 1) {
+        if (models.isEmpty() && page > 1) {
             page = 1;
             models = getSlice(type, 1, asc, attributes, limit);
         }
-        if(models == null || models.size() == 0) {
+        if(models == null || models.isEmpty()) {
             return new DefaultPagination<E>();
         } else {
             return new DefaultPagination<E>(page, limit, (int) getCount(type), models);
@@ -304,17 +313,31 @@ class SimpleDefaultRepository implements DefaultRepository {
     public <E, T> Pagination<E> getPage(
             SingularAttribute<E, T> attribute, T value, int page) {
         List<E> models = getMore(attribute, value, getItemsPerPage());
-        if(models.size() == 0 && page > 1) {
+        if(models.isEmpty() && page > 1) {
             page = 1;
             models = getMore(attribute, value, getItemsPerPage());
         }
-        if(models == null || models.size() == 0) {
+        if(models == null || models.isEmpty()) {
             return new DefaultPagination<E>();
         }
         long count = getCount(attribute, value);
         
         return new DefaultPagination<E>(page, getItemsPerPage(), (int)count, models);
     }
+
+    @Override
+    public <E, T> Pagination<E> getPage(Class<E> type, int page, String query, String count, int limit, Map<String, Object> parameters) {
+        List<E> models = getListOf(type, query, page, limit, parameters);
+        if(models.isEmpty() && page > 1) {
+            page = 1;
+            models = getListOf(type, query, page, limit, parameters);
+        }
+        if(models == null || models.isEmpty()) {
+            return new DefaultPagination<E>();
+        }
+        return new DefaultPagination<E>(page, getItemsPerPage(), (int)getCount(count, parameters), models);
+    }
+    
     @Override
     public <E, T> List<E> getMore(SingularAttribute<E, T> attribute, T value) {
         return generateTypedQuery(attribute, attribute.getDeclaringType().getJavaType(), value).getResultList();
@@ -360,12 +383,12 @@ class SimpleDefaultRepository implements DefaultRepository {
     }
 
     @Override
-    public <E, T> E getOne(SingularAttribute<E, T> attribute, T value) {
+    public <E, T> E getOne(SingularAttribute<E, T> attribute, T value) throws NotFoundException {
         E result = null;
         try {
             result = generateTypedQuery(attribute, attribute.getDeclaringType().getJavaType(), value).getSingleResult();
         } catch (NoResultException e) {
-            LOGGER.log(Level.INFO, e.getMessage(), e);
+            throw new NotFoundException(e.getMessage(), e);
         }
         return result;
     }
@@ -409,5 +432,25 @@ class SimpleDefaultRepository implements DefaultRepository {
     @Override
     public <T> List<T> getListOf(Class<T> type, String query) {
         return entityManager.createQuery(query, type).getResultList();
+    }
+
+    @Override
+    public <T> List<T> getListOf(Class<T> type, String query, int page, Map<String, Object> parameters) {
+        return getListOf(type, query, page, getItemsPerPage(), parameters);
+    }
+    
+    @Override
+    public <T> List<T> getListOf(Class<T> type, String query, int page, int limit, Map<String, Object> parameters) {
+        int startPosition = 0;
+        if (page > 0) {
+            startPosition = (page - 1) * getItemsPerPage();
+        }
+        TypedQuery<T> q = entityManager.createQuery(query, type);
+        if(parameters != null && !parameters.isEmpty()) {
+            for(Map.Entry<String, Object> entry: parameters.entrySet()) {
+                q.setParameter(entry.getKey(), entry.getValue());
+            }
+        }
+        return q.setFirstResult(startPosition).getResultList();
     }
 }
