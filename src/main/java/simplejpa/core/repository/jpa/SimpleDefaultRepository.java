@@ -335,7 +335,7 @@ class SimpleDefaultRepository implements DefaultRepository {
         if(models == null || models.isEmpty()) {
             return new DefaultPagination<E>();
         }
-        return new DefaultPagination<E>(page, getItemsPerPage(), (int)getCount(count, parameters), models);
+        return new DefaultPagination<E>(page, limit, (int)getCount(count, parameters), models);
     }
     
     @Override
@@ -443,7 +443,7 @@ class SimpleDefaultRepository implements DefaultRepository {
     public <T> List<T> getListOf(Class<T> type, String query, int page, int limit, Map<String, Object> parameters) {
         int startPosition = 0;
         if (page > 0) {
-            startPosition = (page - 1) * getItemsPerPage();
+            startPosition = (page - 1) * limit;
         }
         TypedQuery<T> q = entityManager.createQuery(query, type);
         if(parameters != null && !parameters.isEmpty()) {
@@ -451,6 +451,6 @@ class SimpleDefaultRepository implements DefaultRepository {
                 q.setParameter(entry.getKey(), entry.getValue());
             }
         }
-        return q.setFirstResult(startPosition).getResultList();
+        return q.setFirstResult(startPosition).setMaxResults(limit).getResultList();
     }
 }
