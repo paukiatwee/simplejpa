@@ -1,7 +1,7 @@
 /**
  * 
  */
-package simplejpa.core.repository;
+package me.dreamand.jpa.repository;
 
 import java.util.List;
 import java.util.Map;
@@ -9,7 +9,7 @@ import javax.persistence.NonUniqueResultException;
 
 import javax.persistence.metamodel.SingularAttribute;
 
-import simplejpa.core.pagination.Pagination;
+import me.dreamand.jpa.pagination.Pagination;
 
 
 

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package simplejpa.core.model;
+package me.dreamand.jpa.model;
 
 import javax.persistence.Embeddable;
 

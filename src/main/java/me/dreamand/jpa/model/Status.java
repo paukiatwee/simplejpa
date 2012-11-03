@@ -1,4 +1,4 @@
-package simplejpa.core.model;
+package me.dreamand.jpa.model;
 
 /**
  * @author Pau Kiat Wee (mailto:paukiatwee@gmail.com)

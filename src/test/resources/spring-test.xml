@@ -29,5 +29,5 @@
     <property name="password" value="" />
   </bean>
   <tx:annotation-driven transaction-manager="transactionManager" />
-  <bean id="simpleDefaultRepository" class="simplejpa.core.repository.jpa.SimpleDefaultRepository" />
+  <bean id="simpleDefaultRepository" class="me.dreamand.jpa.repository.SimpleDefaultRepository" />
 </beans>

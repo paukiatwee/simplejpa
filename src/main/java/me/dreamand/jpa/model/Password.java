@@ -1,14 +1,14 @@
 /**
  * 
  */
-package simplejpa.core.model;
+package me.dreamand.jpa.model;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
  * @author Pau Kiat Wee (mailto:paukiatwee@gmail.com)
- * @since 0.1
+ * @since 1.0.0
  */
 public class Password {
     
@@ -22,7 +22,7 @@ public class Password {
      * @return the previous
      */
     @NotNull
-    @Size.List({@Size(min = 1, message = "Please fill in this field")})
+    @Size.List({@Size(min = 1, message = "Please fill in this field with at least 5 characters")})
     public String getPrevious() {
         return previous;
     }

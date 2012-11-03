@@ -1,8 +1,10 @@
 /**
  * 
  */
-package simplejpa.core.repository;
+package me.dreamand.jpa.repository;
 
+import me.dreamand.jpa.repository.DefaultRepository;
+import me.dreamand.jpa.repository.NotFoundException;
 import javax.inject.Inject;
 
 import static org.junit.Assert.*;
@@ -16,7 +18,7 @@ import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 import org.springframework.transaction.annotation.Transactional;
 
-import simplejpa.user.User;
+import me.dreamand.jpa.model.User;
 
 /**
  * @author Pau Kiat Wee (mailto:paukiatwee@gmail.com)

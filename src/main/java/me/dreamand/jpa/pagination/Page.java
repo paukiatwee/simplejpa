@@ -1,7 +1,7 @@
 /**
  * 
  */
-package simplejpa.core.pagination;
+package me.dreamand.jpa.pagination;
 
 /**
  * @author Pau Kiat Wee (mailto:paukiatwee@gmail.com)

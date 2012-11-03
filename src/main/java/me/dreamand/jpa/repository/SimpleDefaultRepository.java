@@ -1,7 +1,7 @@
 /**
  * 
  */
-package simplejpa.core.repository.jpa;
+package me.dreamand.jpa.repository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,10 +20,10 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.SingularAttribute;
 
-import simplejpa.core.repository.NotFoundException;
-import simplejpa.core.pagination.DefaultPagination;
-import simplejpa.core.pagination.Pagination;
-import simplejpa.core.repository.DefaultRepository;
+import me.dreamand.jpa.repository.NotFoundException;
+import me.dreamand.jpa.pagination.DefaultPagination;
+import me.dreamand.jpa.pagination.Pagination;
+import me.dreamand.jpa.repository.DefaultRepository;
 
 /**
  * @author Pau Kiat Wee (mailto:paukiatwee@gmail.com)

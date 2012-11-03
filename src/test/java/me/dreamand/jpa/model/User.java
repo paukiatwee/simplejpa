@@ -1,7 +1,7 @@
 /**
  * 
  */
-package simplejpa.user;
+package me.dreamand.jpa.model;
 
 import java.io.Serializable;
 import java.util.Random;

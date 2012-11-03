@@ -1,7 +1,7 @@
 /**
  * 
  */
-package simplejpa.core.repository;
+package me.dreamand.jpa.repository;
 
 
 /**

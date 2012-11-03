@@ -1,7 +1,7 @@
 /**
  * 
  */
-package simplejpa.core.pagination;
+package me.dreamand.jpa.pagination;
 
 import java.util.List;
 
