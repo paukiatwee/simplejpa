@@ -3,8 +3,6 @@
  */
 package me.dreamand.jpa.repository;
 
-import me.dreamand.jpa.repository.DefaultRepository;
-import me.dreamand.jpa.repository.NotFoundException;
 import javax.inject.Inject;
 
 import static org.junit.Assert.*;
@@ -21,8 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 import me.dreamand.jpa.model.User;
 
 /**
+ * 
  * @author Pau Kiat Wee (mailto:paukiatwee@gmail.com)
- *
+ * @since 1.0.0
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration( locations = {"classpath:spring-test.xml"} )

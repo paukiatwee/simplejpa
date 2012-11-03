@@ -8,8 +8,9 @@ import java.util.List;
 
 
 /**
+ * 
  * @author Pau Kiat Wee (mailto:paukiatwee@gmail.com)
- * @since 0.1
+ * @since 1.0.0
  */
 public class DefaultPagination<T> implements Pagination<T>{
     private int currentPage;

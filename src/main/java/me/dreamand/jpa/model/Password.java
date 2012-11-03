@@ -7,6 +7,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
+ * 
  * @author Pau Kiat Wee (mailto:paukiatwee@gmail.com)
  * @since 1.0.0
  */

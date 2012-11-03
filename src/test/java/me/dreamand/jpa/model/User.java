@@ -15,8 +15,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 /**
+ * 
  * @author Pau Kiat Wee (mailto:paukiatwee@gmail.com)
- *
+ * @since 1.0.0
  */
 @Entity
 public class User implements Serializable {

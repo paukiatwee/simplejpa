@@ -6,8 +6,9 @@ package me.dreamand.jpa.model;
 import javax.persistence.Embeddable;
 
 /**
+ * 
  * @author Pau Kiat Wee (mailto:paukiatwee@gmail.com)
- * @since 0.1
+ * @since 1.0.0
  */
 @Embeddable
 public class Address {

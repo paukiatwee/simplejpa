@@ -5,8 +5,9 @@ package me.dreamand.jpa.repository;
 
 
 /**
+ * 
  * @author Pau Kiat Wee (mailto:paukiatwee@gmail.com)
- * @since 0.1
+ * @since 1.0.0
  */
 public class NotFoundException extends Exception {
 

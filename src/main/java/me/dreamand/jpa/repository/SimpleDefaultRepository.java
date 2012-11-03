@@ -6,7 +6,6 @@ package me.dreamand.jpa.repository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.persistence.EntityManager;
@@ -20,14 +19,13 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.SingularAttribute;
 
-import me.dreamand.jpa.repository.NotFoundException;
 import me.dreamand.jpa.pagination.DefaultPagination;
 import me.dreamand.jpa.pagination.Pagination;
-import me.dreamand.jpa.repository.DefaultRepository;
 
 /**
+ * 
  * @author Pau Kiat Wee (mailto:paukiatwee@gmail.com)
- * @since 0.1
+ * @since 1.0.0
  */
 class SimpleDefaultRepository implements DefaultRepository {
 
