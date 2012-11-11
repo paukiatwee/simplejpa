@@ -3,6 +3,8 @@
  */
 package me.dreamand.jpa.repository;
 
+import java.util.Arrays;
+import java.util.List;
 import javax.inject.Inject;
 
 import static org.junit.Assert.*;
@@ -17,6 +19,7 @@ import org.springframework.test.context.transaction.TransactionalTestExecutionLi
 import org.springframework.transaction.annotation.Transactional;
 
 import me.dreamand.jpa.model.User;
+import me.dreamand.jpa.pagination.Pagination;
 
 /**
  * 
@@ -73,7 +76,52 @@ public class DefaultRepositoryTest {
         assertEquals("user1@example.com", newUser.getEmail());
     }
     
+    @Test(expected = NotFoundException.class)
+    public void shouldThrowNotFoundExceptionWhenOneOfTheModelIsNotFound() throws NotFoundException {
+        User u1 = getUser();
+        User u2 = getUser();
+        u2.setId(100l);
+        repository.create(u1);
+        repository.read(Arrays.asList(u1, u2));
+    }
     
+    @Test
+    public void shouldReturnCorrectSlice() {
+        // insert total 13 items
+        for(int i = 0; i <  13; i++) {
+            repository.create(getUser());
+        }
+        List<User> result = repository.getSlice(User.class, 1);
+        // first slice is 12 items
+        assertEquals(12, result.size());
+        result = repository.getSlice(User.class, 2);
+        // second slice is 1 item
+        assertEquals(1, result.size());
+        result = repository.getSlice(User.class, 3);
+        // third slice is 0 item
+        assertEquals(0, result.size());
+    }
+    
+    @Test
+    public void shouldReturnCorrectPagination() {
+        // insert total 13 items
+        for(int i = 0; i <  13; i++) {
+            repository.create(getUser());
+        }
+        Pagination<User> result = repository.getPage(User.class, 1);
+        assertEquals(2, result.getTotalPages());
+        assertEquals(1, result.getCurrentPage());
+        assertEquals(12, result.getItems().size());
+        result = repository.getPage(User.class, 2);
+        assertEquals(2, result.getTotalPages());
+        assertEquals(2, result.getCurrentPage());
+        assertEquals(1, result.getItems().size());
+        result = repository.getPage(User.class, 3);
+        assertEquals(2, result.getTotalPages());
+        assertEquals(1, result.getCurrentPage());
+        assertEquals(12, result.getItems().size());
+    }
+
     private User getUser() {
         User u = new User();
         u.setEmail("email");
