@@ -21,53 +21,51 @@ import me.dreamand.jpa.pagination.Pagination;
 public interface DefaultRepository {
     /**
      * This is method is create a model
-     * @param <T> the model extended from <code>Model</code>
+     * @param <T> the type of the model
      * @param model
      * @return model created by underlying data store
-     *               with key generated
+     *               with key generated if any
      */
     <T> T create(T model);
     /**
      * This is method is used to find specific model based on
-     * the <code>model.getId()</code>
-     * @param <T> the model extended from <code>Model</code>
+     * the model's ID
+     * @param <T> type of the model
      * @param model
-     * @return model found by using <code>T.getId()</code>
+     * @return model found by using model's ID
+     * @throws NotFoundException when the model is not found
      */
     <T> T read(T model) throws NotFoundException;
     /**
      * This method is used to read multiple <code>Model</code>
-     * from data store based on the <code>T.getId()</code> method
-     * @param <T> the model extended from <code>Model</code>
-     * @param models from system input
+     * from data store based on the model's ID
+     * @param <T> type of the model
+     * @param models list of the models to read from data store
      * @return models from data store or empty <code>ArrayList<T></code>
      * @throws NotFoundException when one of the model is not found
      */
     <T> List<T> read(List<T> models) throws NotFoundException;
     /**
      * This method is used to update single <code>model</code>
-     * @param <T> the model extended from <code>Model</code>
+     * @param <T> type of the model
      * @param model need to be update
      * @return model after update
      */
     <T> T update(T model);
     /**
      * This method will delete single model from data store based
-     * on the <code>T.getId()</code> method. If the model does not
+     * on the model's ID. If the model does not
      * exist in data store, the operation is silently failed.
-     * @param <T> the model extended from <code>Model</code>
+     * @param <T> type of the model
      * @param model need to be delete from data store
      */
     <T> void delete(T model) throws NotFoundException;
     /**
      * This method will delete multiple models from data store based
-     * on the <code>T.getId()</code> method. If the models does not
+     * on the models' IDs. If the models does not
      * exist in data store, the operation is silently failed.
-     * This method is calling {@link<T extends Model<?>> void delete(T model);}
-     * in underlying operation 
      * @param <T> the model extended from <code>Model</code>
      * @param models need to be delete from data store
-     * @throws NotFoundException when
      */
     <T> void delete(List<T> models) throws NotFoundException;
     
@@ -232,6 +230,7 @@ public interface DefaultRepository {
     <T> List<T> getListOf(Class<T> type, String query, int page, Map<String, Object> parameters);
     
     <T> List<T> getListOf(Class<T> type, String query, int page, int limit, Map<String, Object> parameters);
+    
     /**
      * @param itemPerPage
      */
