@@ -6,7 +6,6 @@ package me.dreamand.jpa.repository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -33,9 +32,6 @@ class SimpleDefaultRepository implements DefaultRepository {
      * Default items per page
      */
     protected int itemsPerPage = 12;
-    
-    private static final Logger LOGGER = Logger.getLogger(SimpleDefaultRepository.class.getName());
-
     protected EntityManager entityManager;
 
     public SimpleDefaultRepository() {
@@ -450,5 +446,10 @@ class SimpleDefaultRepository implements DefaultRepository {
             }
         }
         return q.setFirstResult(startPosition).setMaxResults(limit).getResultList();
+    }
+    
+    @Override
+    public int bulkChange(String query) {
+        return entityManager.createQuery(query).executeUpdate();
     }
 }

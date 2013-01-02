@@ -231,6 +231,11 @@ public interface DefaultRepository {
     
     <T> List<T> getListOf(Class<T> type, String query, int page, int limit, Map<String, Object> parameters);
     
+    
+    /**
+     * Update model
+     */
+    int bulkChange(String query);
     /**
      * @param itemPerPage
      */
