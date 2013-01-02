@@ -14,76 +14,72 @@ import javax.validation.constraints.Size;
 public class Password {
     
     
-    private String previous;
+    private String current;
     private String password; 
-    private String confirm;
+    private String verify;
     
 
     /**
-     * @return the previous
+     * @return the current password
      */
     @NotNull
-    @Size.List({@Size(min = 1, message = "Please fill in this field with at least 5 characters")})
-    public String getPrevious() {
-        return previous;
+    @Size.List({@Size(min = 6, message = "Password need at least 6 characters")})
+    public String getCurrent() {
+        return current;
     }
 
     /**
-     * @param previous the previous to set
+     * @param current set current password
      */
-    public void setPrevious(String previous) {
-        this.previous = previous;
+    public void setCurrent(String current) {
+        this.current = current;
     }
 
     /**
-     * @return the password
+     * @return new password
      */
     @NotNull
-    @Size.List({@Size(min = 1, message = "Please fill in this field")})
+    @Size.List({@Size(min = 6, message = "Password need at least 6 characters")})
     public String getPassword() {
         return password;
     }
 
     /**
-     * @param password the password to set
+     * @param password new password to set
      */
     public void setPassword(String password) {
         this.password = password;
     }
 
     /**
-     * @return the confirm
+     * @return the verify
      */
     @NotNull
     @Size.List({@Size(min = 1, message = "Please fill in this field")})
-    public String getConfirm() {
-        return confirm;
+    public String getVerify() {
+        return verify;
     }
 
     /**
-     * @param confirm the confirm to set
+     * @param verify verify password to be set
      */
-    public void setConfirm(String confirm) {
-        this.confirm = confirm;
+    public void setVerify(String verify) {
+        this.verify = verify;
     }
 
     public void clear() {
-        setPrevious("");
+        setCurrent("");
         setPassword("");
-        setConfirm("");
+        setVerify("");
     }
     
     
     public boolean isMatch() {
-        if(getPassword() != null && getConfirm() != null && getPassword().equals(getConfirm())) {
+        if(getPassword() != null && getVerify() != null && getPassword().equals(getVerify())) {
             return true;
         } else {
             clear();
             return false;
         }
     }
-    
-    
-    
-
 }
