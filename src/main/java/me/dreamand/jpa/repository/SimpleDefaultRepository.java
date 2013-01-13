@@ -26,7 +26,7 @@ import me.dreamand.jpa.pagination.Pagination;
  * @author Pau Kiat Wee (mailto:paukiatwee@gmail.com)
  * @since 1.0.0
  */
-class SimpleDefaultRepository implements DefaultRepository {
+public class SimpleDefaultRepository implements DefaultRepository {
 
     /*
      * Default items per page
