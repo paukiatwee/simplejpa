@@ -5,6 +5,7 @@ package me.dreamand.jpa.repository;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import javax.inject.Inject;
 
 import static org.junit.Assert.*;
@@ -32,6 +33,8 @@ import me.dreamand.jpa.pagination.Pagination;
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class, TransactionalTestExecutionListener.class})
 @Transactional
 public class DefaultRepositoryTest {
+
+    static Random RANDOM = new Random();
     
     @Inject
     DefaultRepository repository;
@@ -124,9 +127,13 @@ public class DefaultRepositoryTest {
 
     private User getUser() {
         User u = new User();
-        u.setEmail("email");
+        u.setEmail("email" + random());
         u.setPassword("password");
-        u.setUsername("username");
+        u.setUsername("username" + random());
         return u;
+    }
+
+    private int random() {
+        return RANDOM.nextInt();
     }
 }
