@@ -7,8 +7,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import javax.inject.Inject;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
 import static org.junit.Assert.*;
+
+import me.dreamand.jpa.model.User_;
+import me.dreamand.jpa.query.Specification;
+import static me.dreamand.jpa.query.Specifications.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -123,6 +131,26 @@ public class DefaultRepositoryTest {
         assertEquals(2, result.getTotalPages());
         assertEquals(1, result.getCurrentPage());
         assertEquals(12, result.getItems().size());
+    }
+
+    @Test
+    public void shouldAbleToUseSpecification() {
+        final User user = getUser();
+        repository.create(user);
+        Specification<User> byEmail = new Specification<User>() {
+            @Override
+            public Predicate toPredicate(Root<User> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+                return cb.equal(root.get(User_.email), user.getEmail());
+            }
+        };
+        Specification<User> byUsername = new Specification<User>() {
+            @Override
+            public Predicate toPredicate(Root<User> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+                return cb.equal(root.get(User_.username), user.getUsername());
+            }
+        };
+        List<User> u = repository.getListOf(User.class, where(byUsername).and(byEmail));
+        assertEquals(1, u.size());
     }
 
     private User getUser() {

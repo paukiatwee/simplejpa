@@ -17,10 +17,10 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <junit.version>4.11</junit.version>
     <mockito.version>1.9.5</mockito.version>
-    <org.hibernate.version>4.2.3.Final</org.hibernate.version>
+    <org.hibernate.version>4.2.4.Final</org.hibernate.version>
     <org.hibernate.hibernate-validator.version>5.0.1.Final</org.hibernate.hibernate-validator.version>
     <javax.validation.version>1.1.0.Final</javax.validation.version>
-    <org.springframework.version>3.2.3.RELEASE</org.springframework.version>
+    <org.springframework.version>3.2.4.RELEASE</org.springframework.version>
     <org.hsqldb.version>2.3.0</org.hsqldb.version>
   </properties>
 

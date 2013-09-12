@@ -10,7 +10,7 @@ import javax.persistence.NonUniqueResultException;
 import javax.persistence.metamodel.SingularAttribute;
 
 import me.dreamand.jpa.pagination.Pagination;
-
+import me.dreamand.jpa.query.Specification;
 
 
 /**
@@ -165,6 +165,13 @@ public interface DefaultRepository {
      * @return count of the model type <code>type</code> in data store
      */
     <T> long getCount(Class<T> type);
+
+    /**
+     * @param attribute
+     * @param value
+     * @return
+     */
+    <E, T> long getCount(SingularAttribute<E, T> attribute, T value);
     
     long getCount(String count, Map<String, Object> parameters);
     /**
@@ -218,18 +225,14 @@ public interface DefaultRepository {
      * @return
      */
     <E, T> E getOne(SingularAttribute<E, T> attribute, T value) throws NotFoundException, NonUniqueResultException;
-    /**
-     * @param attribute
-     * @param value
-     * @return
-     */
-    <E, T> long getCount(SingularAttribute<E, T> attribute, T value);
     
     <T> List<T> getListOf(Class<T> type, String query);
     
     <T> List<T> getListOf(Class<T> type, String query, int page, Map<String, Object> parameters);
     
     <T> List<T> getListOf(Class<T> type, String query, int page, int limit, Map<String, Object> parameters);
+
+    <T> List<T> getListOf(Class<T> type, Specification<T> spec);
     
     
     /**

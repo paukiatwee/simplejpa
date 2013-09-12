@@ -20,6 +20,7 @@ import javax.persistence.metamodel.SingularAttribute;
 
 import me.dreamand.jpa.pagination.DefaultPagination;
 import me.dreamand.jpa.pagination.Pagination;
+import me.dreamand.jpa.query.Specification;
 
 /**
  * 
@@ -426,6 +427,15 @@ public class SimpleDefaultRepository implements DefaultRepository {
     @Override
     public <T> List<T> getListOf(Class<T> type, String query) {
         return entityManager.createQuery(query, type).getResultList();
+    }
+
+    @Override
+    public <T> List<T> getListOf(Class<T> type, Specification<T> spec) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<T> q = cb.createQuery(type);
+        Root<T> from = q.from(type);
+        q.where(spec.toPredicate(from, q, cb));
+        return entityManager.createQuery(q).getResultList();
     }
 
     @Override
