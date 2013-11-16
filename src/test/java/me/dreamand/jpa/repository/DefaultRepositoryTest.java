@@ -9,6 +9,8 @@ import java.util.Random;
 import javax.inject.Inject;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
@@ -151,6 +153,39 @@ public class DefaultRepositoryTest {
         };
         List<User> u = repository.getListOf(User.class, where(byUsername).and(byEmail));
         assertEquals(1, u.size());
+    }
+
+    @Test
+    public void queryOneWithSpec() throws NotFoundException {
+        final User u1 = getUser();
+        u1.setGender('M');
+        repository.create(u1);
+        final User u2 = getUser();
+        u2.setGender('F');
+        repository.create(u2);
+        Specification<User> male = new Specification<User>() {
+            @Override
+            public Predicate toPredicate(Root<User> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+                return cb.equal(root.get(User_.username), u1.getUsername());
+            }
+        };
+
+        User maleUser = repository.getOne(User.class, male);
+        assertEquals(u1.getId(), maleUser.getId());
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void queryOneWithSpecWithNoResult() throws NotFoundException {
+        final User u1 = getUser();
+        repository.create(u1);
+        Specification<User> male = new Specification<User>() {
+            @Override
+            public Predicate toPredicate(Root<User> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+                return cb.equal(root.get(User_.username), "");
+            }
+        };
+
+        repository.getOne(User.class, male);
     }
 
     private User getUser() {

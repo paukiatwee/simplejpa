@@ -9,6 +9,7 @@ import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -386,6 +387,19 @@ public class SimpleDefaultRepository implements DefaultRepository {
             throw new NotFoundException(e.getMessage(), e);
         }
         return result;
+    }
+
+    @Override
+    public <T> T getOne(Class<T> type, Specification<T> spec) throws NotFoundException, NonUniqueResultException {
+        try {
+            CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+            CriteriaQuery<T> q = cb.createQuery(type);
+            Root<T> from = q.from(type);
+            q.where(spec.toPredicate(from, q, cb));
+            return entityManager.createQuery(q).getSingleResult();
+        } catch (NoResultException e) {
+            throw new NotFoundException(e.getMessage(), e);
+        }
     }
 
     @Override

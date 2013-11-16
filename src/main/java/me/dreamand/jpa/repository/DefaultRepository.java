@@ -225,6 +225,8 @@ public interface DefaultRepository {
      * @return
      */
     <E, T> E getOne(SingularAttribute<E, T> attribute, T value) throws NotFoundException, NonUniqueResultException;
+
+    <T> T getOne(Class<T> type, Specification<T> spec) throws NotFoundException, NonUniqueResultException;
     
     <T> List<T> getListOf(Class<T> type, String query);
     

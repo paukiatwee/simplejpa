@@ -18,6 +18,7 @@
     <junit.version>4.11</junit.version>
     <mockito.version>1.9.5</mockito.version>
     <org.hibernate.version>4.2.4.Final</org.hibernate.version>
+    <org.hibernate.hibernate-jpamodelgen.version>1.2.0.Final</org.hibernate.hibernate-jpamodelgen.version>
     <org.hibernate.hibernate-validator.version>5.0.1.Final</org.hibernate.hibernate-validator.version>
     <javax.validation.version>1.1.0.Final</javax.validation.version>
     <org.springframework.version>3.2.4.RELEASE</org.springframework.version>
@@ -49,10 +50,66 @@
           <source>1.7</source>
           <target>1.7</target>
           <encoding>UTF-8</encoding>
+          <compilerArgument>-proc:none</compilerArgument>
         </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-javadoc-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.bsc.maven</groupId>
+        <artifactId>maven-processor-plugin</artifactId>
+        <version>2.2.4</version>
+        <executions>
+          <execution>
+            <id>process</id>
+            <goals>
+              <goal>process</goal>
+            </goals>
+            <phase>generate-sources</phase>
+            <configuration>
+              <!-- source output directory -->
+              <outputDirectory>src/main/java</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+        <dependencies>
+          <!-- hibernate static metamodel processor -->
+          <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-jpamodelgen</artifactId>
+            <version>${org.hibernate.hibernate-jpamodelgen.version}</version>
+            <exclusions>
+              <exclusion>
+                <groupId>org.hibernate.javax.persistence</groupId>
+                <artifactId>hibernate-jpa-2.0-api</artifactId>
+              </exclusion>
+            </exclusions>
+          </dependency>
+        </dependencies>
+      </plugin>
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>remove-staticmetamodel</id>
+            <goals>
+              <goal>clean</goal>
+            </goals>
+            <phase>pre-clean</phase>
+            <configuration>
+              <filesets>
+                <fileset>
+                  <directory>${basedir}/src/main/java</directory>
+                  <includes>
+                    <include>**/*_.java</include>
+                  </includes>
+                  <followSymlinks>false</followSymlinks>
+                </fileset>
+              </filesets>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

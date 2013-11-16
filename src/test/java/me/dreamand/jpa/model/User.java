@@ -30,6 +30,7 @@ public class User implements Serializable {
     private String username;
     private String password;
     private String email;
+    private char gender;
     
     public User() {
         
@@ -95,16 +96,12 @@ public class User implements Serializable {
     public void setEmail(String email) {
         this.email = email;
     }
-    
-    public static void main(String[] args) {
-        SortedSet<Float> randoms = new TreeSet<Float>();
-        Random random = new Random();
-        while(randoms.size() < 5) {
-            randoms.add(random.nextFloat());
-        }
-        for(Float r: randoms) {
-            System.out.println(r);
-        }
+
+    public char getGender() {
+        return gender;
     }
-    
+
+    public void setGender(char gender) {
+        this.gender = gender;
+    }
 }
