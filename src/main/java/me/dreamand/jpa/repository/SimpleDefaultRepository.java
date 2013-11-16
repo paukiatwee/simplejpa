@@ -46,6 +46,11 @@ public class SimpleDefaultRepository implements DefaultRepository {
     }
 
     @Override
+    public EntityManager getEntityManager() {
+        return entityManager;
+    }
+
+    @Override
     public <T> T create(T model) {
         entityManager.persist(model);
         return model;

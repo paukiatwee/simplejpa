@@ -5,6 +5,7 @@ package me.dreamand.jpa.repository;
 
 import java.util.List;
 import java.util.Map;
+import javax.persistence.EntityManager;
 import javax.persistence.NonUniqueResultException;
 
 import javax.persistence.metamodel.SingularAttribute;
@@ -249,4 +250,6 @@ public interface DefaultRepository {
      * @return
      */
     int getItemsPerPage();
+
+    EntityManager getEntityManager();
 }
