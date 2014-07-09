@@ -13,11 +13,10 @@ public class QueryBuilder {
     private boolean firstClause = true;
     private StringBuilder query = new StringBuilder();
     private StringBuilder count = new StringBuilder();
-    private String from;
     private char alias;
+    private boolean firstOrder = true;
     
     public QueryBuilder from(String from) {
-        this.from = from;
         this.alias = from.toLowerCase().toCharArray()[0];
         query
             .append(" FROM ")
@@ -125,12 +124,23 @@ public class QueryBuilder {
     }
     
     public QueryBuilder order(String property, Order order) {
-        query
-            .append(" ORDER BY ")
-            .append(alias)
-            .append(".")
-            .append(property)
-            .append(order.getOperator());
+
+        if(firstOrder) {
+            firstOrder = false;
+            query
+                .append(" ORDER BY ")
+                .append(alias)
+                .append(".")
+                .append(property)
+                .append(order.getOperator());
+        } else {
+            query
+                .append(", ")
+                .append(alias)
+                .append(".")
+                .append(property)
+                .append(order.getOperator());
+        }
         return this;
     }
     

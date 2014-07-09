@@ -91,6 +91,17 @@ public class QueryBuilderTest {
         assertEquals("SELECT u FROM User u ORDER BY u.id DESC", q.getQuery());
         assertEquals("SELECT COUNT(u) FROM User u", q.getCount());
     }
+
+    @Test
+    public void shouldSupportMultipleOrders() {
+        QueryBuilder builder = builder()
+                .from("User")
+                .order("id", Order.ASC)
+                .order("created_at", Order.DESC);
+        Query q = builder.build();
+        assertEquals("SELECT u FROM User u ORDER BY u.id ASC, u.created_at DESC", q.getQuery());
+        assertEquals("SELECT COUNT(u) FROM User u", q.getCount());
+    }
     
     @Test
     public void shouldAbleAddWhereClauseAndOrderTheResult() {
