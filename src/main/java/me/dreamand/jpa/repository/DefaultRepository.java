@@ -197,33 +197,33 @@ public interface DefaultRepository {
      */
     <E, T> List<E> getMore(SingularAttribute<E, T> attribute,T value, int limit, int page);
     /**
-     * @param attribute
-     * @param limit
-     * @return
+     * @param attribute the attribute used to order <code>DESC</code>
+     * @param limit the limit of the result
+     * @return the list of models
      */
     <E, T> List<E> getMore(SingularAttribute<E, T> attribute, int limit);
     /**
-     * @param attribute
-     * @param asc
-     * @return
+     * @param attribute the attribute used to order
+     * @param asc true for ascending, false for descending
+     * @return the list of models
      */
     <E, T> List<E> getOrderBy(SingularAttribute<E, T> attribute, boolean asc);
     /**
-     * @param attribute
-     * @param limit
-     * @param asc
-     * @return
+     * @param attribute the attributed used to order
+     * @param limit the limit of the result
+     * @param asc true for ascending, false for descending
+     * @return the list of models
      */
     <E, T> List<E> getOrderBy(SingularAttribute<E, T> attribute, int limit, boolean asc);
     /**
-     * @param attribute
-     * @return
+     * @param attribute the attribute used in <code>group by</code> clause
+     * @return the list of models
      */
     <E, T> List<E> getGroupBy(SingularAttribute<E, T> attribute);
     /**
-     * @param attribute
-     * @param value
-     * @return
+     * @param attribute the attribute of the model
+     * @param value the value of the attribute
+     * @return the model
      */
     <E, T> E getOne(SingularAttribute<E, T> attribute, T value) throws NotFoundException, NonUniqueResultException;
 
@@ -240,16 +240,22 @@ public interface DefaultRepository {
     
     /**
      * Update model
+     * @param query the query used to execute
+     * @return return number of row(s) affected
      */
     int bulkChange(String query);
     /**
-     * @param itemPerPage
+     * @param itemPerPage the item per page
      */
     void setItemsPerPage(int itemPerPage);
     /**
-     * @return
+     * @return items per page
      */
     int getItemsPerPage();
 
+    /**
+     * useful to operate on enityt manager directly
+     * @return get underlaying entity manager
+     */
     EntityManager getEntityManager();
 }

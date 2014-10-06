@@ -24,8 +24,8 @@ public class Specifications<T> implements Specification<T> {
     /**
      * Simple static factory method to add some syntactic sugar around a {@link Specification}.
      *
-     * @param <T>
      * @param spec can be {@literal null}.
+     * @return new specification with <code>where</code> added
      */
     public static <T> Specifications<T> where(Specification<T> spec) {
         return new Specifications<T>(spec);
@@ -35,6 +35,7 @@ public class Specifications<T> implements Specification<T> {
      * ANDs the given {@link Specification} to the current one.
      *
      * @param other can be {@literal null}.
+     * @return new speficition with <code>other</code> applied as <code>AND</code>
      */
     public Specifications<T> and(final Specification<T> other) {
 
@@ -54,6 +55,7 @@ public class Specifications<T> implements Specification<T> {
      * ORs the given specification to the current one.
      *
      * @param other can be {@literal null}.
+     * @return new speficition with <code>other</code> applied as <code>OR</code>
      */
     public Specifications<T> or(final Specification<T> other) {
 
@@ -72,7 +74,6 @@ public class Specifications<T> implements Specification<T> {
     /**
      * Negates the given {@link Specification}.
      *
-     * @param <T>
      * @param spec can be {@literal null}.
      */
     public static <T> Specifications<T> not(final Specification<T> spec) {

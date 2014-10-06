@@ -24,22 +24,22 @@ public class NotFoundException extends Exception {
     }
 
     /**
-     * @param message
-     * @param cause
+     * @param message the message
+     * @param cause the cause
      */
     public NotFoundException(String message, Throwable cause) {
         super(message, cause);
     }
 
     /**
-     * @param message
+     * @param message the messaage
      */
     public NotFoundException(String message) {
         super(message);
     }
 
     /**
-     * @param cause
+     * @param cause the cause
      */
     public NotFoundException(Throwable cause) {
         super(cause);
