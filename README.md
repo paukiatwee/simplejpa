@@ -1,12 +1,12 @@
 Simple JPA [![Build Status](https://secure.travis-ci.org/paukiatwee/simplejpa.png)](http://travis-ci.org/paukiatwee/simplejpa)
 ==========
-Simple JPA is the lightweight Java JPA2 framework that simplify the usage of JPA2.
+Simple JPA is the lightweight Java JPA2.1 framework that simplify the usage of JPA2.1
 This framework is mavenized as well. :)
 
 
-JPA2 Implementation Used
+JPA2.1 Implementation Used
 ------------------------
-Hibernate 4.2.3.Final.Final
+Hibernate 4.3.6.Final
 
 Usage
 -----
@@ -33,4 +33,3 @@ Sample usage with Spring
 Author
 ------
 Pau Kiat Wee (paukiatwee@gmail.com)
-
